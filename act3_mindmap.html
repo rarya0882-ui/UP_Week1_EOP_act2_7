@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Joko's Mind Map Builder - Strengths vs. Weaknesses</title>
+    <style>
+        /* Modern, Gen-Z Professional Theme (Deep Violet, Dark Indigo, Glowing Cyan & Purple) */
+        :root {
+            --bg-gradient-start: #080315;
+            --bg-gradient-end: #0a0b24;
+            --card-bg: rgba(20, 18, 48, 0.7);
+            --card-border: rgba(139, 92, 246, 0.25);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-primary: #8b5cf6; /* Purple */
+            --accent-secondary: #6366f1; /* Indigo */
+            --accent-glow: #06b6d4; /* Cyan */
+            --strength-color: #10b981; /* Emerald Green */
+            --weakness-color: #ef4444; /* Rose Red */
+            --bubble-bg: rgba(139, 92, 246, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* Container Layout */
+        .app-container {
+            width: 100%;
+            max-width: 950px;
+            background: rgba(15, 12, 41, 0.5);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            padding: 25px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Header Style */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+            padding-bottom: 20px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-glow));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: white;
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
+        }
+
+        .logo-text h1 {
+            font-size: 1.3rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #ffffff, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text p {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .instruction-box {
+            background: rgba(139, 92, 246, 0.08);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 14px;
+            padding: 15px 20px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: #cbd5e1;
+        }
+
+        .instruction-box strong {
+            color: var(--accent-glow);
+        }
+
+        /* MIND MAP CANVAS AREA */
+        .mindmap-canvas {
+            background: rgba(10, 8, 30, 0.45);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+            position: relative;
+            padding: 40px 20px;
+            min-height: 450px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.5);
+        }
+
+        /* SVG Connections Background */
+        .mindmap-svg-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Central Node */
+        .node-center {
+            position: relative;
+            z-index: 10;
+            width: 130px;
+            height: 130px;
+            background: radial-gradient(circle, #2d1b54 0%, #150e2b 100%);
+            border: 2px solid var(--accent-primary);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1rem;
+            color: white;
+            text-align: center;
+            box-shadow: 0 0 25px rgba(139, 92, 246, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .node-center span {
+            font-size: 0.75rem;
+            color: var(--accent-glow);
+            font-weight: 500;
+            text-transform: uppercase;
+            margin-top: 3px;
+        }
+
+        /* Branch Headers */
+        .node-branch {
+            position: absolute;
+            z-index: 8;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .branch-strengths {
+            top: 15%;
+            left: 20%;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1.5px solid var(--strength-color);
+            color: #34d399;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.15);
+        }
+
+        .branch-weaknesses {
+            bottom: 15%;
+            right: 20%;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1.5px solid var(--weakness-color);
+            color: #f87171;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.15);
+        }
+
+        .branch-strengths span, .branch-weaknesses span {
+            font-size: 0.65rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        /* Slots / Floating Bubbles */
+        .slot-bubble {
+            position: absolute;
+            z-index: 5;
+            width: 120px;
+            height: 55px;
+            border-radius: 30px;
+            border: 2px dashed rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.02);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center;
+            padding: 5px 12px;
+            line-height: 1.2;
+        }
+
+        .slot-bubble:hover {
+            transform: scale(1.05);
+        }
+
+        .slot-bubble.active-target {
+            border-color: var(--accent-glow);
+            background: rgba(6, 182, 212, 0.08);
+            box-shadow: 0 0 12px rgba(6, 182, 212, 0.2);
+            color: white;
+        }
+
+        /* Strengths Slots Position (Left Quadrants) */
+        .strength-slot-1 { top: 12%; left: 45%; }
+        .strength-slot-2 { top: 22%; left: 10%; }
+        .strength-slot-3 { top: 48%; left: 8%; }
+        .strength-slot-4 { top: 72%; left: 25%; }
+
+        /* Weaknesses Slots Position (Right Quadrants) */
+        .weakness-slot-1 { top: 12%; right: 25%; }
+        .weakness-slot-2 { top: 38%; right: 8%; }
+        .weakness-slot-3 { top: 68%; right: 10%; }
+        .weakness-slot-4 { top: 78%; right: 45%; }
+
+        /* Loaded states for slots */
+        .slot-bubble.filled {
+            border-style: solid;
+            color: white;
+        }
+
+        .slot-bubble.filled-strength {
+            background: rgba(16, 185, 129, 0.15);
+            border-color: var(--strength-color);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+        }
+
+        .slot-bubble.filled-weakness {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: var(--weakness-color);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
+        }
+
+        /* Result Verification Styles */
+        .slot-bubble.correct {
+            background: rgba(16, 185, 129, 0.3) !important;
+            border-color: #10b981 !important;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.4) !important;
+        }
+
+        .slot-bubble.incorrect {
+            background: rgba(239, 68, 68, 0.3) !important;
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.4) !important;
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-4px); }
+            40%, 80% { transform: translateX(4px); }
+        }
+
+        /* WORD POOL BLOCK */
+        .pool-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .pool-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pool-title::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-glow);
+            box-shadow: 0 0 8px var(--accent-glow);
+        }
+
+        .word-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        /* Word Chip */
+        .word-chip {
+            background: rgba(139, 92, 246, 0.08);
+            border: 1px solid rgba(139, 92, 246, 0.35);
+            color: #e2e8f0;
+            padding: 10px 18px;
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            user-select: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .word-chip:hover {
+            background: rgba(139, 92, 246, 0.18);
+            border-color: var(--accent-primary);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .word-chip.selected {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .word-chip.used {
+            opacity: 0.25;
+            cursor: not-allowed;
+            pointer-events: none;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        /* ACTIONS FOOTER */
+        .actions-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 20px;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #94a3b8;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary:hover {
+            border-color: rgba(255,255,255,0.3);
+            color: white;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border: none;
+            color: white;
+            padding: 14px 35px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.35);
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        /* FEEDBACK BAR */
+        .feedback-banner {
+            padding: 14px 18px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .feedback-banner.correct {
+            display: flex;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            color: #a7f3d0;
+        }
+
+        .feedback-banner.incorrect {
+            display: flex;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            color: #fca5a5;
+        }
+
+        /* COMPLETION MODAL OVERLAY */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(5, 3, 15, 0.9);
+            backdrop-filter: blur(12px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-card {
+            background: linear-gradient(135deg, #120e2e, #1a1740);
+            border: 1.5px solid rgba(139, 92, 246, 0.35);
+            border-radius: 28px;
+            max-width: 480px;
+            width: 100%;
+            padding: 35px;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+            animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes modalPop {
+            from { transform: scale(0.85); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-badge {
+            width: 80px; height: 80px;
+            background: radial-gradient(circle, var(--accent-primary) 0%, rgba(99, 102, 241, 0.4) 100%);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            box-shadow: 0 0 25px rgba(139, 92, 246, 0.45);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #ffffff, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .modal-body {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-bottom: 25px;
+            line-height: 1.55;
+        }
+
+        .modal-btn {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-glow));
+            border: none;
+            color: white;
+            padding: 14px 32px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            width: 100%;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+            transition: all 0.2s;
+        }
+
+        .modal-btn:hover {
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6);
+            transform: translateY(-1px);
+        }
+
+        /* Responsiveness adjustments */
+        @media (max-width: 768px) {
+            .mindmap-canvas {
+                min-height: 520px;
+            }
+            .node-center {
+                width: 105px;
+                height: 105px;
+                font-size: 0.85rem;
+            }
+            .node-center span { font-size: 0.65rem; }
+            .slot-bubble {
+                width: 105px;
+                height: 50px;
+                font-size: 0.75rem;
+            }
+            .strength-slot-1 { top: 8%; left: 35%; }
+            .strength-slot-2 { top: 22%; left: 5%; }
+            .strength-slot-3 { top: 52%; left: 3%; }
+            .strength-slot-4 { top: 76%; left: 15%; }
+            .weakness-slot-1 { top: 8%; right: 15%; }
+            .weakness-slot-2 { top: 35%; right: 3%; }
+            .weakness-slot-3 { top: 64%; right: 4%; }
+            .weakness-slot-4 { top: 82%; right: 35%; }
+            .branch-strengths { top: 15%; left: 15%; }
+            .branch-weaknesses { bottom: 15%; right: 15%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header>
+            <div class="logo-section">
+                <div class="logo-icon">M</div>
+                <div class="logo-text">
+                    <h1>Joko's Mind Map Builder</h1>
+                    <p>Self-Research Workspace • Strengths vs. Weaknesses</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dynamic Directions -->
+        <div class="instruction-box">
+            👉 <strong>How to Play:</strong> 1. Click a word from the <strong>Word Pool</strong> below. 2. Click an empty circle in the mind map to place it. Correctly classify Joko's <strong>Strengths</strong> (Kelebihan) on the left and <strong>Weaknesses</strong> (Kekurangan) on the right!
+        </div>
+
+        <!-- MIND MAP WORKSPACE -->
+        <div class="mindmap-canvas">
+            <!-- Connecting SVG Lines Layer -->
+            <svg class="mindmap-svg-layer" id="svg-connections"></svg>
+
+            <!-- Center Core -->
+            <div class="node-center" id="core-node">
+                JOKO
+                <span>Self-Research</span>
+            </div>
+
+            <!-- Branch Labels -->
+            <div class="node-branch branch-strengths" id="branch-s">
+                Strengths
+                <span>Kelebihan</span>
+            </div>
+            <div class="node-branch branch-weaknesses" id="branch-w">
+                Weaknesses
+                <span>Kekurangan</span>
+            </div>
+
+            <!-- Strength Bubble Slots (Left Branch) -->
+            <div class="slot-bubble strength-slot-1" id="strength-slot-1" onclick="slotClicked(this, 'strength')" data-slot-index="1" data-type="strength">Slot 1</div>
+            <div class="slot-bubble strength-slot-2" id="strength-slot-2" onclick="slotClicked(this, 'strength')" data-slot-index="2" data-type="strength">Slot 2</div>
+            <div class="slot-bubble strength-slot-3" id="strength-slot-3" onclick="slotClicked(this, 'strength')" data-slot-index="3" data-type="strength">Slot 3</div>
+            <div class="slot-bubble strength-slot-4" id="strength-slot-4" onclick="slotClicked(this, 'strength')" data-slot-index="4" data-type="strength">Slot 4</div>
+
+            <!-- Weakness Bubble Slots (Right Branch) -->
+            <div class="slot-bubble weakness-slot-1" id="weakness-slot-1" onclick="slotClicked(this, 'weakness')" data-slot-index="1" data-type="weakness">Slot 1</div>
+            <div class="slot-bubble weakness-slot-2" id="weakness-slot-2" onclick="slotClicked(this, 'weakness')" data-slot-index="2" data-type="weakness">Slot 2</div>
+            <div class="slot-bubble weakness-slot-3" id="weakness-slot-3" onclick="slotClicked(this, 'weakness')" data-slot-index="3" data-type="weakness">Slot 3</div>
+            <div class="slot-bubble weakness-slot-4" id="weakness-slot-4" onclick="slotClicked(this, 'weakness')" data-slot-index="4" data-type="weakness">Slot 4</div>
+        </div>
+
+        <!-- WORD POOL CARD -->
+        <div class="pool-card">
+            <div class="pool-title">Adjective Word Pool</div>
+            <div class="word-pool" id="word-pool-container"></div>
+        </div>
+
+        <!-- FOOTER ACTIONS -->
+        <div class="actions-footer">
+            <button class="btn-secondary" onclick="resetMindmap()">Reset Board</button>
+            <button class="btn-primary" id="btn-check" onclick="checkMindmap()" disabled>Check Classifications</button>
+        </div>
+
+        <div class="feedback-banner" id="game-feedback"></div>
+    </div>
+
+    <!-- Modal Success -->
+    <div class="modal-overlay" id="success-modal">
+        <div class="modal-card">
+            <div class="modal-badge">🎯</div>
+            <div class="modal-title">Luar Biasa! (Fantastic!)</div>
+            <div class="modal-body">
+                You successfully helped Joko map his personal profile! Understanding your own strengths and weaknesses is the vital starting point of the job-seeking roadmap.
+            </div>
+            <button class="modal-btn" onclick="closeModal()">Close & Review</button>
+        </div>
+    </div>
+
+    <script>
+        // Grounded Vocab from Sources and customized notes
+        const strengthsList = ["Creative", "Hard-working", "Organised", "Reliable"];
+        const weaknessesList = ["Disorganised", "Impatient", "Moody", "Indecisive"];
+
+        // State Management
+        let selectedWord = null;
+        let selectedChipId = null;
+        let audioCtx = null;
+
+        // Connections mapping for drawing lines
+        const slots = [
+            { id: "strength-slot-1", targetId: "branch-s" },
+            { id: "strength-slot-2", targetId: "branch-s" },
+            { id: "strength-slot-3", targetId: "branch-s" },
+            { id: "strength-slot-4", targetId: "branch-s" },
+            { id: "weakness-slot-1", targetId: "branch-w" },
+            { id: "weakness-slot-2", targetId: "branch-w" },
+            { id: "weakness-slot-3", targetId: "branch-w" },
+            { id: "weakness-slot-4", targetId: "branch-w" }
+        ];
+
+        // Combine and shuffle words
+        let wordPool = [...strengthsList, ...weaknessesList];
+
+        function initApp() {
+            renderWordPool();
+            resetSlotElements();
+            drawConnectingLines();
+            window.addEventListener('resize', drawConnectingLines);
+        }
+
+        // Web Audio Synthesizer SFX
+        function playSound(type) {
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                const now = audioCtx.currentTime;
+
+                if (type === 'success') {
+                    // Upward Major chord arpeggio
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, now); // C5
+                    osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
+                    osc.frequency.setValueAtTime(783.99, now + 0.2); // G5
+                    osc.frequency.setValueAtTime(1046.50, now + 0.3); // C6
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+                    osc.start(now);
+                    osc.stop(now + 0.55);
+                } else if (type === 'error') {
+                    // Low error buzzer
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(140, now);
+                    osc.frequency.exponentialRampToValueAtTime(80, now + 0.3);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.35);
+                } else if (type === 'click') {
+                    // Soft synthetic click
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(600, now);
+                    osc.frequency.exponentialRampToValueAtTime(200, now + 0.08);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+                    osc.start(now);
+                    osc.stop(now + 0.1);
+                }
+            } catch (e) {
+                console.log("Audio not supported or blocked", e);
+            }
+        }
+
+        function renderWordPool() {
+            const container = document.getElementById('word-pool-container');
+            container.innerHTML = '';
+            
+            // Randomize array
+            wordPool.sort(() => Math.random() - 0.5);
+
+            wordPool.forEach((word, idx) => {
+                const chip = document.createElement('div');
+                chip.className = 'word-chip';
+                chip.id = `chip-${idx}`;
+                chip.textContent = word;
+                chip.onclick = () => selectWordChip(word, `chip-${idx}`);
+                container.appendChild(chip);
+            });
+        }
+
+        function resetSlotElements() {
+            document.querySelectorAll('.slot-bubble').forEach(slot => {
+                slot.className = `slot-bubble ${slot.id}`;
+                slot.innerHTML = "Empty Slot";
+                slot.removeAttribute('data-loaded-word');
+                slot.removeAttribute('data-source-chip-id');
+            });
+            document.getElementById('btn-check').disabled = true;
+            document.getElementById('game-feedback').style.display = 'none';
+        }
+
+        function selectWordChip(word, chipId) {
+            playSound('click');
+            const chip = document.getElementById(chipId);
+            if (chip.classList.contains('used')) return;
+
+            // Deselect previous
+            if (selectedChipId) {
+                const prev = document.getElementById(selectedChipId);
+                if (prev) prev.classList.remove('selected');
+            }
+
+            if (selectedChipId === chipId) {
+                // Toggle off
+                selectedWord = null;
+                selectedChipId = null;
+            } else {
+                selectedWord = word;
+                selectedChipId = chipId;
+                chip.classList.add('selected');
+
+                // Highlight compatible slots briefly
+                document.querySelectorAll('.slot-bubble:not(.filled)').forEach(slot => {
+                    slot.classList.add('active-target');
+                });
+                setTimeout(() => {
+                    document.querySelectorAll('.slot-bubble').forEach(slot => {
+                        slot.classList.remove('active-target');
+                    });
+                }, 800);
+            }
+        }
+
+        function slotClicked(slotElement, slotType) {
+            // Case 1: Slot has a word -> click to remove it and send back to pool
+            if (slotElement.classList.contains('filled')) {
+                playSound('click');
+                const word = slotElement.getAttribute('data-loaded-word');
+                const chipId = slotElement.getAttribute('data-source-chip-id');
+                
+                // Return chip to active status
+                const chip = document.getElementById(chipId);
+                if (chip) {
+                    chip.classList.remove('used');
+                    chip.classList.remove('selected');
+                }
+
+                // Empty out the slot
+                slotElement.className = `slot-bubble ${slotElement.id}`;
+                slotElement.innerHTML = "Empty Slot";
+                slotElement.removeAttribute('data-loaded-word');
+                slotElement.removeAttribute('data-source-chip-id');
+
+                selectedWord = null;
+                selectedChipId = null;
+                validateCompletion();
+                return;
+            }
+
+            // Case 2: Slot is empty and word is selected -> place word
+            if (selectedWord && selectedChipId) {
+                playSound('click');
+                slotElement.innerHTML = selectedWord;
+                slotElement.setAttribute('data-loaded-word', selectedWord);
+                slotElement.setAttribute('data-source-chip-id', selectedChipId);
+                
+                // Update styling
+                slotElement.classList.add('filled');
+                slotElement.classList.add(slotType === 'strength' ? 'filled-strength' : 'filled-weakness');
+
+                // Hide source chip
+                const chip = document.getElementById(selectedChipId);
+                if (chip) {
+                    chip.classList.remove('selected');
+                    chip.classList.add('used');
+                }
+
+                // Reset selection
+                selectedWord = null;
+                selectedChipId = null;
+                validateCompletion();
+            }
+        }
+
+        function validateCompletion() {
+            let filledCount = 0;
+            document.querySelectorAll('.slot-bubble').forEach(slot => {
+                if (slot.classList.contains('filled')) filledCount++;
+            });
+
+            const checkBtn = document.getElementById('btn-check');
+            checkBtn.disabled = (filledCount !== 8);
+        }
+
+        function checkMindmap() {
+            let allCorrect = true;
+            document.querySelectorAll('.slot-bubble').forEach(slot => {
+                const word = slot.getAttribute('data-loaded-word');
+                const type = slot.getAttribute('data-type');
+                
+                let isWordCorrect = false;
+                if (type === 'strength') {
+                    isWordCorrect = strengthsList.includes(word);
+                } else if (type === 'weakness') {
+                    isWordCorrect = weaknessesList.includes(word);
+                }
+
+                if (isWordCorrect) {
+                    slot.className = `slot-bubble ${slot.id} filled correct`;
+                } else {
+                    slot.className = `slot-bubble ${slot.id} filled incorrect`;
+                    allCorrect = false;
+                }
+            });
+
+            const feedback = document.getElementById('game-feedback');
+            if (allCorrect) {
+                feedback.className = "feedback-banner correct";
+                feedback.innerHTML = "✅ Luar Biasa! All adjectives are perfectly mapped in Joko's Strengths & Weaknesses branches.";
+                feedback.style.display = 'flex';
+                playSound('success');
+                setTimeout(() => {
+                    document.getElementById('success-modal').style.display = 'flex';
+                }, 800);
+            } else {
+                feedback.className = "feedback-banner incorrect";
+                feedback.innerHTML = "❌ Some traits are placed in the wrong categories. Tap the red incorrect bubbles to return them and try again.";
+                feedback.style.display = 'flex';
+                playSound('error');
+            }
+        }
+
+        function resetMindmap() {
+            renderWordPool();
+            resetSlotElements();
+            selectedWord = null;
+            selectedChipId = null;
+        }
+
+        function closeModal() {
+            document.getElementById('success-modal').style.display = 'none';
+        }
+
+        // SVG Vector Connections Generator
+        function drawConnectingLines() {
+            const svg = document.getElementById('svg-connections');
+            svg.innerHTML = ''; // Clear lines
+
+            const canvasRect = svg.getBoundingClientRect();
+            const core = document.getElementById('core-node').getBoundingClientRect();
+            const branchS = document.getElementById('branch-s').getBoundingClientRect();
+            const branchW = document.getElementById('branch-w').getBoundingClientRect();
+
+            // Core coordinates relative to SVG canvas
+            const coreX = (core.left + core.width / 2) - canvasRect.left;
+            const coreY = (core.top + core.height / 2) - canvasRect.top;
+
+            const bSX = (branchS.left + branchS.width / 2) - canvasRect.left;
+            const bSY = (branchS.top + branchS.height / 2) - canvasRect.top;
+
+            const bWX = (branchW.left + branchW.width / 2) - canvasRect.left;
+            const bWY = (branchW.top + branchW.height / 2) - canvasRect.top;
+
+            // 1. Draw core branch links
+            drawBezierCurve(svg, coreX, coreY, bSX, bSY, 'rgba(139, 92, 246, 0.4)', 4, true);
+            drawBezierCurve(svg, coreX, coreY, bWX, bWY, 'rgba(139, 92, 246, 0.4)', 4, true);
+
+            // 2. Draw branch to slot links
+            slots.forEach(slotItem => {
+                const slotNode = document.getElementById(slotItem.id);
+                const branchNode = document.getElementById(slotItem.targetId);
+                
+                if (slotNode && branchNode) {
+                    const slotRect = slotNode.getBoundingClientRect();
+                    const branchRect = branchNode.getBoundingClientRect();
+
+                    const sX = (slotRect.left + slotRect.width / 2) - canvasRect.left;
+                    const sY = (slotRect.top + slotRect.height / 2) - canvasRect.top;
+
+                    const bX = (branchRect.left + branchRect.width / 2) - canvasRect.left;
+                    const bY = (branchRect.top + branchRect.height / 2) - canvasRect.top;
+
+                    const color = slotItem.targetId === 'branch-s' ? 'rgba(16, 185, 129, 0.3)' : 'rgba(239, 68, 68, 0.3)';
+                    drawBezierCurve(svg, bX, bY, sX, sY, color, 2, false);
+                }
+            });
+        }
+
+        function drawBezierCurve(svg, x1, y1, x2, y2, color, strokeWidth, glow) {
+            const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            
+            // Calculate organic curves
+            const dx = Math.abs(x2 - x1) * 0.4;
+            const controlX1 = x1 + (x2 > x1 ? dx : -dx);
+            const controlY1 = y1;
+            const controlX2 = x2 - (x2 > x1 ? dx : -dx);
+            const controlY2 = y2;
+
+            const dAttribute = `M ${x1} ${y1} C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, ${x2} ${y2}`;
+            
+            path.setAttribute("d", dAttribute);
+            path.setAttribute("stroke", color);
+            path.setAttribute("stroke-width", strokeWidth);
+            path.setAttribute("fill", "none");
+            
+            if (glow) {
+                path.setAttribute("filter", "drop-shadow(0 0 4px rgba(139, 92, 246, 0.5))");
+            }
+
+            svg.appendChild(path);
+        }
+
+        // Initialize App on window load
+        window.addEventListener('load', initApp);
+    </script>
+</body>
+</html>

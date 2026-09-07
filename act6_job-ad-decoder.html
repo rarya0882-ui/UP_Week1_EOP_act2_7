@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job Ad Decoder - Deciphering Career Jargon</title>
+    <style>
+        /* Modern, Gen-Z Professional Theme (Deep Violet, Dark Indigo, Electric Cyan) */
+        :root {
+            --bg-gradient-start: #080518;
+            --bg-gradient-end: #0b0c24;
+            --card-bg: rgba(21, 18, 48, 0.7);
+            --card-border: rgba(99, 102, 241, 0.25);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-primary: #6366f1; /* Indigo */
+            --accent-secondary: #a855f7; /* Purple */
+            --accent-glow: #06b6d4; /* Cyan */
+            --success-color: #10b981; /* Emerald */
+            --error-color: #ef4444; /* Rose */
+            --highlight-bg: rgba(6, 182, 212, 0.2);
+            --highlight-border: #06b6d4;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 1100px;
+            background: rgba(15, 12, 41, 0.45);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            padding: 25px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            margin-top: 10px;
+        }
+
+        /* Header Navigation */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(99, 102, 241, 0.15);
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: white;
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .logo-text h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #ffffff, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text p {
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
+
+        /* Main Game Layout */
+        .game-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 900px) {
+            .game-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* LEFT COLUMN: Interactive Job Ads Board */
+        .ad-board-card {
+            background: rgba(10, 8, 30, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-height: 700px;
+            overflow-y: auto;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.4);
+        }
+
+        .board-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent-glow);
+            border-left: 3px solid var(--accent-glow);
+            padding-left: 10px;
+            margin-bottom: 5px;
+        }
+
+        /* Mock Job Ad Paper look */
+        .mock-ad {
+            background: #ffffff;
+            color: #1e293b;
+            border-radius: 14px;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            font-family: 'Georgia', serif;
+            line-height: 1.5;
+            position: relative;
+        }
+
+        .mock-ad::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 5px;
+            border-radius: 14px 14px 0 0;
+        }
+
+        .ad-media-x::before {
+            background: #6366f1;
+        }
+
+        .ad-queen::before {
+            background: #d97706;
+        }
+
+        .ad-title {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 8px;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 6px;
+        }
+
+        .ad-meta {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #64748b;
+            margin-bottom: 12px;
+        }
+
+        .ad-body {
+            font-size: 0.88rem;
+            color: #334155;
+            margin-bottom: 15px;
+        }
+
+        /* Code/Abbrev Interactive Hotspots */
+        .decoder-tag {
+            background: rgba(99, 102, 241, 0.15);
+            border-bottom: 2px dashed var(--accent-primary);
+            color: var(--accent-primary);
+            font-weight: 700;
+            padding: 1px 4px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Courier New', Courier, monospace;
+            transition: all 0.2s ease;
+            display: inline-block;
+        }
+
+        .decoder-tag:hover {
+            background: var(--accent-primary);
+            color: white;
+            box-shadow: 0 0 10px rgba(99, 102, 241, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .decoder-tag.decoded {
+            background: rgba(16, 185, 129, 0.15);
+            border-bottom: 2px solid var(--success-color);
+            color: #059669;
+        }
+
+        /* RIGHT COLUMN: Console Decoder Screen */
+        .decoder-console-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            min-height: 500px;
+        }
+
+        .console-status-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .console-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .progress-tracker {
+            background: rgba(6, 182, 212, 0.1);
+            border: 1px solid rgba(6, 182, 212, 0.25);
+            color: var(--accent-glow);
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            text-transform: uppercase;
+        }
+
+        /* Empty state instruction screen */
+        .instruction-view {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            gap: 15px;
+            flex-grow: 1;
+            padding: 40px 20px;
+        }
+
+        .instruction-icon {
+            font-size: 3.5rem;
+            animation: pulse-glow 2s infinite ease-in-out;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 5px rgba(6, 182, 212, 0.2)); }
+            50% { transform: scale(1.05); filter: drop-shadow(0 0 15px rgba(6, 182, 212, 0.5)); }
+        }
+
+        /* Active Question Display */
+        .active-question-view {
+            display: none;
+            flex-direction: column;
+            gap: 20px;
+            flex-grow: 1;
+            animation: slideIn 0.35s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(15px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .selected-term-box {
+            background: rgba(168, 85, 247, 0.1);
+            border: 1px solid rgba(168, 85, 247, 0.25);
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .term-badge {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: #d8b4fe;
+            background: rgba(168, 85, 247, 0.2);
+            padding: 4px 12px;
+            border-radius: 6px;
+            border: 1px solid rgba(168, 85, 247, 0.3);
+        }
+
+        .term-context {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .question-prompt {
+            font-size: 1rem;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        /* MCQ Answer Buttons */
+        .mcq-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background: rgba(15, 12, 41, 0.7);
+            border: 1.5px solid rgba(255, 255, 255, 0.08);
+            color: #cbd5e1;
+            padding: 14px 18px;
+            border-radius: 12px;
+            font-size: 0.92rem;
+            font-weight: 600;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .option-btn:hover {
+            border-color: var(--accent-primary);
+            background: rgba(99, 102, 241, 0.08);
+            transform: translateX(4px);
+        }
+
+        .option-letter {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #94a3b8;
+            flex-shrink: 0;
+        }
+
+        /* Option Correct/Incorrect states */
+        .option-btn.correct {
+            background: rgba(16, 185, 129, 0.12) !important;
+            border-color: var(--success-color) !important;
+            color: #a7f3d0 !important;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.25);
+        }
+
+        .option-btn.correct .option-letter {
+            background: var(--success-color);
+            border-color: var(--success-color);
+            color: white;
+        }
+
+        .option-btn.incorrect {
+            background: rgba(239, 68, 68, 0.1) !important;
+            border-color: var(--error-color) !important;
+            color: #fca5a5 !important;
+            opacity: 0.6;
+            cursor: not-allowed;
+            animation: shake 0.35s ease-in-out;
+        }
+
+        .option-btn.incorrect .option-letter {
+            background: var(--error-color);
+            border-color: var(--error-color);
+            color: white;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+
+        /* Grammar Feedback Reveal */
+        .feedback-explanation-box {
+            display: none;
+            background: rgba(16, 185, 129, 0.08);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 15px;
+            animation: expand-reveal 0.3s ease-out;
+        }
+
+        .feedback-title {
+            color: #34d399;
+            font-weight: 700;
+            font-size: 0.92rem;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .feedback-text {
+            font-size: 0.88rem;
+            color: #cbd5e1;
+            line-height: 1.4;
+        }
+
+        @keyframes expand-reveal {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Action Nav Footer */
+        .console-footer {
+            margin-top: 25px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            padding-top: 15px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .next-btn {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border: none;
+            color: white;
+            padding: 12px 28px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.92rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.35);
+            transition: all 0.2s ease;
+            display: none;
+        }
+
+        .next-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+        }
+
+        /* Complete Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(5, 3, 15, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-card {
+            background: linear-gradient(135deg, #131131, #1e1b4b);
+            border: 1.5px solid rgba(168, 85, 247, 0.35);
+            border-radius: 28px;
+            max-width: 480px;
+            width: 100%;
+            padding: 35px;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+        }
+
+        .modal-badge {
+            width: 80px; height: 80px;
+            background: radial-gradient(circle, var(--accent-secondary) 0%, rgba(99, 102, 241, 0.4) 100%);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            box-shadow: 0 0 25px rgba(168, 85, 247, 0.45);
+        }
+
+        .modal-title {
+            font-size: 1.5rem; font-weight: 800; margin-bottom: 10px;
+            background: linear-gradient(to right, #fff, #c084fc);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        .modal-body {
+            font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 25px; line-height: 1.5;
+        }
+
+        .modal-btn {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-glow));
+            border: none; color: white; padding: 12px 32px; border-radius: 12px;
+            font-weight: 700; cursor: pointer; width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header>
+            <div class="logo-section">
+                <div class="logo-icon">🖨️</div>
+                <div class="logo-text">
+                    <h1>Job Advertisement Decoder</h1>
+                    <p>Stage 2: Deciphering Career Jargon & Shorthand Codes</p>
+                </div>
+            </div>
+            <div class="progress-tracker" id="score-tracker">Decoded: 0 / 10</div>
+        </header>
+
+        <!-- Game Interface -->
+        <div class="game-layout">
+            <!-- LEFT PANEL: Interactive Job Advertisements -->
+            <div class="ad-board-card">
+                <div class="board-title">Interactive Job Advertisements</div>
+                <p style="font-size: 0.82rem; color: var(--text-secondary); margin-top: -10px; margin-bottom: 5px;">
+                    👉 Tap any highlighted keyword in the newspapers below to decode its meaning!
+                </p>
+
+                <!-- AD 1: MEDIA ASSISTANT -->
+                <div class="mock-ad ad-media-x">
+                    <div class="ad-title">Media Assistant. Media X</div>
+                    <div class="ad-meta">Quote <span class="decoder-tag" id="tag-Ref" onclick="triggerTerm('Ref')">Ref</span>: 007584 MX</div>
+                    <div class="ad-body">
+                        An excellent opportunity to work for a leading international group in a small but lively media department. 
+                        We are looking for a well-organised and motivated graduate. 
+                        Please email your <span class="decoder-tag" id="tag-CV" onclick="triggerTerm('CV')">CV</span> and cover letter to colm@MediaX.com.
+                        <br><br>
+                        <strong>Requirements:</strong> 2 years of related <span class="decoder-tag" id="tag-EXP" onclick="triggerTerm('EXP')">EXP</span> is preferred. 
+                        Proficiency in MS Office is essential.
+                        <br><br>
+                        <strong>Salary:</strong> <span class="decoder-tag" id="tag-circa" onclick="triggerTerm('circa')">circa</span> £28<span class="decoder-tag" id="tag-K" onclick="triggerTerm('K')">K</span> <span class="decoder-tag" id="tag-pro-rata" onclick="triggerTerm('pro-rata')">pro rata</span>.
+                        <br><br>
+                        <strong>Deadline:</strong> <span class="decoder-tag" id="tag-Closing-Date" onclick="triggerTerm('Closing-Date')">Closing Date</span> is May 23rd.
+                    </div>
+                </div>
+
+                <!-- AD 2: FINANCE CONSULTANT -->
+                <div class="mock-ad ad-queen">
+                    <div class="ad-title">Trainee Finance Consultant</div>
+                    <div class="ad-meta">Queen Careers Recruiting <span class="decoder-tag" id="tag-AGY" onclick="triggerTerm('AGY')">AGY</span></div>
+                    <div class="ad-body">
+                        Your Profile: Are you a motivated graduate with a track record of success? 
+                        Must possess <span class="decoder-tag" id="tag-CCDL" onclick="triggerTerm('CCDL')">CCDL</span> for external client site visits.
+                        <br><br>
+                        <strong>Package:</strong> £30K-£35K <span class="decoder-tag" id="tag-OTE" onclick="triggerTerm('OTE')">OTE</span>. 
+                        Fabulous training program provided. Excellent long-term career growth.
+                        <br><br>
+                        <strong>Compensation Rate:</strong> Basic salary listed <span class="decoder-tag" id="tag-PA" onclick="triggerTerm('PA')">PA</span>.
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT PANEL: Console Decoder Screen -->
+            <div class="decoder-console-card">
+                <div class="console-status-header">
+                    <div class="console-title">🖥️ Decoder Control Engine</div>
+                    <span class="progress-tracker" id="active-term-badge">Waiting...</span>
+                </div>
+
+                <!-- Empty Initial State view -->
+                <div class="instruction-view" id="console-instruction-view">
+                    <div class="instruction-icon">🔍</div>
+                    <h3 style="font-size: 1.15rem; margin-bottom: 8px;">Job Ad Decoder Offline Mode</h3>
+                    <p style="font-size: 0.9rem; color: var(--text-secondary); max-width: 320px; line-height: 1.5;">
+                        Career ads use a lot of short codes to save space. Tap any highlighted code in the ads to start deciphering.
+                    </p>
+                </div>
+
+                <!-- Active Question Screen -->
+                <div class="active-question-view" id="console-question-view">
+                    <div class="selected-term-box">
+                        <span class="term-badge" id="display-term">CV</span>
+                        <span class="term-context" id="display-context">Context: "Please email your CV..."</span>
+                    </div>
+
+                    <div class="question-prompt" id="display-prompt">
+                        What does the abbreviation "CV" stand for?
+                    </div>
+
+                    <div class="mcq-options" id="options-box">
+                        <!-- Buttons will be dynamically populated -->
+                    </div>
+
+                    <div class="feedback-explanation-box" id="explanation-box">
+                        <div class="feedback-title">🎯 Decoded Successfully!</div>
+                        <div class="feedback-text" id="display-explanation">
+                            Curriculum Vitae represents a structured document outlining your qualifications and history...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Next Control Button -->
+                <div class="console-footer">
+                    <button class="next-btn" id="next-exercise-btn" onclick="goToNextDecoded()">Next Abbreviation ▶</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Victory Modal -->
+    <div class="modal-overlay" id="victory-modal">
+        <div class="modal-card">
+            <div class="modal-badge">🎯</div>
+            <div class="modal-title">Luar Biasa! (Fantastic!)</div>
+            <div class="modal-body">
+                You have successfully decoded all 10 career abbreviations and Latin expressions found in job advertisements! 
+                You are now ready to read professional postings like a real recruiter.
+            </div>
+            <button class="modal-btn" onclick="resetAllDecoder()">Reset and Practice Again</button>
+        </div>
+    </div>
+
+    <script>
+        const decoderDatabase = {
+            'Ref': {
+                term: "Ref",
+                context: "Quote Ref: 007584 MX",
+                prompt: "What does 'Ref' (or 'Quote Ref') mean in a job advertisement?",
+                options: [
+                    { key: "A", text: "Refund — money you get back if you fail the application.", correct: false },
+                    { key: "B", text: "Reference Number — a code identifying the job post.", correct: true },
+                    { key: "C", text: "Referral — the name of the boss who recommended you.", correct: false }
+                ],
+                explanation: "<strong>Reference Number</strong> (Nomor Referensi). In job ads, 'Ref' is a unique code. You must write this code in your email subject so the company knows exactly which job you are applying for.",
+                decoded: false
+            },
+            'CV': {
+                term: "CV",
+                context: "Please email your CV and cover letter...",
+                prompt: "What does the abbreviation 'CV' stand for?",
+                options: [
+                    { key: "A", text: "Career Value — your desired salary amount.", correct: false },
+                    { key: "B", text: "Curriculum Vitae — a summary of your career and studies.", correct: true },
+                    { key: "C", text: "Career Vision — your 5-year goal statement.", correct: false }
+                ],
+                explanation: "<strong>Curriculum Vitae</strong> (Daftar Riwayat Hidup / Resume). It is a formal document summarizing your education, qualifications, and work experience. (Halaman 15, Ex 8b)",
+                decoded: false
+            },
+            'EXP': {
+                term: "EXP",
+                context: "2 years of related EXP is preferred.",
+                prompt: "What does the abbreviation 'EXP' mean?",
+                options: [
+                    { key: "A", text: "Experience — time spent doing a specific job.", correct: true },
+                    { key: "B", text: "Expense — how much the job costs the company.", correct: false },
+                    { key: "C", text: "Expertise — a special certificate of wisdom.", correct: false }
+                ],
+                explanation: "<strong>Experience</strong> (Pengalaman Kerja). 'EXP' is a shorthand for previous time spent working in a relevant role. Most ads state the minimum years of EXP required. (Halaman 15, Ex 8b)",
+                decoded: false
+            },
+            'circa': {
+                term: "circa",
+                context: "Salary: circa £28K pro rata.",
+                prompt: "What does the Latin word 'circa' mean?",
+                options: [
+                    { key: "A", text: "Exactly — the absolute exact amount.", correct: false },
+                    { key: "B", text: "Approximately — around or about.", correct: true },
+                    { key: "C", text: "Maximum — the highest limit possible.", correct: false }
+                ],
+                explanation: "<strong>Approximately</strong> (Sekitar / Kurang Lebih). 'Circa' is a Latin term used in job advertisements to show that a salary figure is not exact, but is an estimated starting point. (Halaman 17, Ex 8g)",
+                decoded: false
+            },
+            'K': {
+                term: "K",
+                context: "Salary: circa £28K pro rata.",
+                prompt: "What does the letter 'K' stand for when talking about salaries?",
+                options: [
+                    { key: "A", text: "Kilo / Thousand — indicating three zeros.", correct: true },
+                    { key: "B", text: "Karat — showing the level of gold quality.", correct: false },
+                    { key: "C", text: "Krona — the local currency of Sweden.", correct: false }
+                ],
+                explanation: "<strong>Thousand</strong> (Ribu). In the business world, 'K' stands for a thousand (derived from the Greek 'Kilo'). Therefore, £28K equals £28,000 per year. (Halaman 17, Ex 8g)",
+                decoded: false
+            },
+            'pro-rata': {
+                term: "pro rata",
+                context: "Salary: circa £28K pro rata.",
+                prompt: "What does the Latin expression 'pro rata' mean?",
+                options: [
+                    { key: "A", text: "Paid in cash — cash in hand daily.", correct: false },
+                    { key: "B", text: "Proportional salary — calculated based on hours worked.", correct: true },
+                    { key: "C", text: "Tax free — zero taxes deducted.", correct: false }
+                ],
+                explanation: "<strong>Proportional</strong> (Proporsional). 'Pro rata' means if you work part-time (e.g., 20 hours instead of a full 40-hour week), you receive a proportional fraction of the stated full-time salary. (Halaman 17, Ex 8g)",
+                decoded: false
+            },
+            'Closing-Date': {
+                term: "Closing Date",
+                context: "Closing Date is May 23rd.",
+                prompt: "What is the meaning of a 'Closing Date' in an advert?",
+                options: [
+                    { key: "A", text: "The day the office is closed for holidays.", correct: false },
+                    { key: "B", text: "The deadline — after this date, applications are not accepted.", correct: true },
+                    { key: "C", text: "The date of the final job interview.", correct: false }
+                ],
+                explanation: "<strong>Deadline</strong> (Batas Akhir Pendaftaran). The 'Closing Date' is the final calendar date by which the employer must receive your application cover letter and CV. (Halaman 17, Ex 8g)",
+                decoded: false
+            },
+            'AGY': {
+                term: "AGY",
+                context: "Queen Careers Recruiting AGY",
+                prompt: "What does the abbreviation 'AGY' stand for?",
+                options: [
+                    { key: "A", text: "Agreement — a signed mutual contract.", correct: false },
+                    { key: "B", text: "Agency — a recruitment consultant firm handling the hiring.", correct: true },
+                    { key: "C", text: "Agriculture — relating to food production.", correct: false }
+                ],
+                explanation: "<strong>Agency</strong> (Agensi Rekrutmen). 'AGY' means the advertisement is posted by an external employment agency or consulting firm on behalf of a client, rather than the company directly. (Halaman 15, Ex 8b)",
+                decoded: false
+            },
+            'CCDL': {
+                term: "CCDL",
+                context: "Must possess CCDL for external visits.",
+                prompt: "What does the abbreviation 'CCDL' stand for?",
+                options: [
+                    { key: "A", text: "Company Certified Digital License.", correct: false },
+                    { key: "B", text: "Current Clean Driving Licence.", correct: true },
+                    { key: "C", text: "Creative Communication Degree License.", correct: false }
+                ],
+                explanation: "<strong>Current Clean Driving Licence</strong> (SIM Aktif & Bersih). This means you have an active driver's license and you do not have any serious police driving penalties or points on your traffic record. (Halaman 15, Ex 8b)",
+                decoded: false
+            },
+            'OTE': {
+                term: "OTE",
+                context: "Package: £30K-£35K OTE.",
+                prompt: "What does the abbreviation 'OTE' stand for?",
+                options: [
+                    { key: "A", text: "On Target Earnings — basic salary plus target commissions.", correct: true },
+                    { key: "B", text: "Office Tax Expense — mandatory city workspace fees.", correct: false },
+                    { key: "C", text: "Overtime Earnings — guaranteed premium hourly rates.", correct: false }
+                ],
+                explanation: "<strong>On Target Earnings</strong> (Gaji Target Komisi). This means the stated high salary is only achievable if you reach all your sales performance targets. It is a combination of basic salary + performance commissions. (Halaman 15, Ex 8b)",
+                decoded: false
+            },
+            'PA': {
+                term: "PA",
+                context: "Basic salary listed PA.",
+                prompt: "What does 'PA' stand for when listed next to a salary?",
+                options: [
+                    { key: "A", text: "Personal Assistant — a specific job title.", correct: false },
+                    { key: "B", text: "Per Annum — calculated per year.", correct: true },
+                    { key: "C", text: "Post Application — money paid after starting.", correct: false }
+                ],
+                explanation: "<strong>Per Annum</strong> (Per Tahun). 'PA' is a Latin abbreviation meaning per year. A salary listed as £30,000 PA means you earn £30,000 for a full year of work. (Halaman 15, Ex 8b)",
+                decoded: false
+            }
+        };
+
+        let activeTerm = null;
+        let decodedCount = 0;
+        const totalTerms = 10; // We have 11 items in database, we require decoding 10 target items to win
+        let audioCtx = null;
+
+        function playSound(type) {
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                const now = audioCtx.currentTime;
+
+                if (type === 'success') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, now);
+                    osc.frequency.setValueAtTime(659.25, now + 0.1);
+                    osc.frequency.setValueAtTime(783.99, now + 0.2);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                    osc.start(now); osc.stop(now + 0.45);
+                } else if (type === 'error') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(150, now);
+                    osc.frequency.exponentialRampToValueAtTime(80, now + 0.35);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                    osc.start(now); osc.stop(now + 0.4);
+                }
+            } catch (e) { console.log(e); }
+        }
+
+        function triggerTerm(termKey) {
+            activeTerm = decoderDatabase[termKey];
+            
+            // Switch Console View
+            document.getElementById('console-instruction-view').style.display = 'none';
+            const qView = document.getElementById('console-question-view');
+            qView.style.display = 'flex';
+            
+            // Populate Details
+            document.getElementById('display-term').textContent = activeTerm.term;
+            document.getElementById('display-context').textContent = `Context: "${activeTerm.context}"`;
+            document.getElementById('active-term-badge').textContent = `Decoding: ${activeTerm.term}`;
+            document.getElementById('display-prompt').innerHTML = activeTerm.prompt;
+            
+            // Hide feedback and next button by default
+            document.getElementById('explanation-box').style.display = 'none';
+            document.getElementById('next-exercise-btn').style.display = 'none';
+
+            // Render MCQs
+            const optBox = document.getElementById('options-box');
+            optBox.innerHTML = '';
+            
+            activeTerm.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerHTML = `<span class="option-letter">${opt.key}</span><span class="option-text">${opt.text}</span>`;
+                btn.onclick = () => selectOption(btn, opt.correct);
+                optBox.appendChild(btn);
+            });
+
+            // Highlight tag in the document
+            document.querySelectorAll('.decoder-tag').forEach(tag => {
+                tag.style.boxShadow = 'none';
+            });
+            const activeTag = document.getElementById(`tag-${termKey}`);
+            if (activeTag) {
+                activeTag.style.boxShadow = '0 0 15px var(--accent-glow)';
+            }
+        }
+
+        function selectOption(clickedBtn, isCorrect) {
+            if (clickedBtn.classList.contains('correct') || clickedBtn.classList.contains('incorrect')) return;
+
+            if (isCorrect) {
+                clickedBtn.className = 'option-btn correct';
+                playSound('success');
+                
+                // Disable all options
+                document.querySelectorAll('.option-btn').forEach(b => {
+                    b.style.pointerEvents = 'none';
+                });
+
+                // Show Explanation
+                const expBox = document.getElementById('explanation-box');
+                expBox.style.display = 'block';
+                document.getElementById('display-explanation').innerHTML = activeTerm.explanation;
+                
+                // Show next control
+                document.getElementById('next-exercise-btn').style.display = 'block';
+
+                // Track and update global progress
+                if (!activeTerm.decoded) {
+                    activeTerm.decoded = true;
+                    decodedCount++;
+                    document.getElementById('score-tracker').textContent = `Decoded: ${decodedCount} / ${totalTerms}`;
+                    
+                    // Mark tag as decoded on left pane
+                    const activeTagId = Object.keys(decoderDatabase).find(k => decoderDatabase[k] === activeTerm);
+                    const leftTag = document.getElementById(`tag-${activeTagId}`);
+                    if (leftTag) {
+                        leftTag.classList.add('decoded');
+                    }
+                }
+            } else {
+                clickedBtn.className = 'option-btn incorrect';
+                playSound('error');
+            }
+        }
+
+        function goToNextDecoded() {
+            // Check victory
+            if (decodedCount >= totalTerms) {
+                setTimeout(() => {
+                    document.getElementById('victory-modal').style.display = 'flex';
+                }, 400);
+                return;
+            }
+
+            // Close active question panel and prompt to find next
+            document.getElementById('console-question-view').style.display = 'none';
+            document.getElementById('console-instruction-view').style.display = 'flex';
+            document.getElementById('active-term-badge').textContent = 'Waiting...';
+            
+            // Remove active highlights
+            document.querySelectorAll('.decoder-tag').forEach(tag => {
+                tag.style.boxShadow = 'none';
+            });
+        }
+
+        function resetAllDecoder() {
+            decodedCount = 0;
+            document.getElementById('score-tracker').textContent = `Decoded: 0 / ${totalTerms}`;
+            
+            Object.keys(decoderDatabase).forEach(key => {
+                decoderDatabase[key].decoded = false;
+                const tag = document.getElementById(`tag-${key}`);
+                if (tag) {
+                    tag.classList.remove('decoded');
+                    tag.style.boxShadow = 'none';
+                }
+            });
+
+            document.getElementById('victory-modal').style.display = 'none';
+            document.getElementById('console-question-view').style.display = 'none';
+            document.getElementById('console-instruction-view').style.display = 'flex';
+            document.getElementById('active-term-badge').textContent = 'Waiting...';
+        }
+    </script>
+</body>
+</html>

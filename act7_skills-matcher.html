@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Joko's Career Journey - Skill Matcher</title>
+    <style>
+        /* Modern, Gen-Z Professional Theme (Deep Purple, Electric Blue, Cyan) */
+        :root {
+            --bg-gradient-start: #0a051b;
+            --bg-gradient-end: #0c0d2b;
+            --card-bg: rgba(25, 22, 59, 0.65);
+            --card-border: rgba(99, 102, 241, 0.25);
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --accent-primary: #6366f1; /* Indigo */
+            --accent-secondary: #a855f7; /* Purple */
+            --accent-glow: #06b6d4; /* Cyan */
+            --success-color: #10b981; /* Emerald */
+            --error-color: #ef4444; /* Rose */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* Container Layout */
+        .app-container {
+            width: 100%;
+            max-width: 1024px;
+            background: rgba(15, 12, 41, 0.45);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            padding: 25px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            margin-top: 10px;
+        }
+
+        /* Header Navigation */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(99, 102, 241, 0.15);
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: white;
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .logo-text h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #ffffff, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text p {
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
+
+        .badge {
+            background: rgba(6, 182, 212, 0.15);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            color: var(--accent-glow);
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Main Game Layout */
+        .game-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .game-intro {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 10px;
+        }
+
+        .game-intro h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .game-intro p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Twin Columns */
+        .matching-board {
+            position: relative;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 25px;
+        }
+
+        @media (max-width: 768px) {
+            .matching-board {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
+        .column-title {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .board-column {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* Matching Cards */
+        .match-card {
+            background: var(--card-bg);
+            border: 1.5px solid var(--card-border);
+            border-radius: 16px;
+            padding: 18px;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .match-card:hover:not(.matched) {
+            transform: translateY(-2px);
+            border-color: var(--accent-glow);
+            box-shadow: 0 8px 20px rgba(6, 182, 212, 0.15);
+        }
+
+        .match-card.selected {
+            border-color: var(--accent-secondary);
+            background: rgba(168, 85, 247, 0.15);
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.3);
+            transform: scale(1.02);
+        }
+
+        .match-card.matched {
+            border-color: var(--success-color);
+            background: rgba(16, 185, 129, 0.12);
+            cursor: default;
+            pointer-events: none;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.1);
+        }
+
+        .card-number {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #94a3b8;
+            flex-shrink: 0;
+            transition: all 0.25s ease;
+        }
+
+        .match-card.selected .card-number {
+            background: var(--accent-secondary);
+            color: white;
+        }
+
+        .match-card.matched .card-number {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .card-content {
+            font-size: 0.95rem;
+            font-weight: 500;
+            line-height: 1.4;
+            flex-grow: 1;
+        }
+
+        /* Explanation and Dialog area */
+        .explanation-panel {
+            background: rgba(15, 12, 41, 0.8);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 20px;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            margin-bottom: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .explanation-text {
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: var(--text-secondary);
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .explanation-text strong {
+            color: var(--accent-glow);
+        }
+
+        /* Action Buttons */
+        .game-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .reset-btn {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #94a3b8;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .reset-btn:hover {
+            border-color: var(--accent-primary);
+            color: white;
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(5, 3, 15, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-card {
+            background: linear-gradient(135deg, #131131, #1e1b4b);
+            border: 1.5px solid rgba(168, 85, 247, 0.35);
+            border-radius: 28px;
+            max-width: 500px;
+            width: 100%;
+            padding: 35px;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+            animation: modalScale 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes modalScale {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-badge {
+            width: 80px; height: 80px;
+            background: radial-gradient(circle, var(--accent-secondary) 0%, rgba(99, 102, 241, 0.4) 100%);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            box-shadow: 0 0 25px rgba(168, 85, 247, 0.45);
+        }
+
+        .modal-title {
+            font-size: 1.5rem; font-weight: 800; margin-bottom: 12px;
+            background: linear-gradient(to right, #fff, #c084fc);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        .modal-body {
+            font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 25px; line-height: 1.5;
+        }
+
+        .modal-btn {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-glow));
+            border: none; color: white; padding: 12px 32px; border-radius: 12px;
+            font-weight: 700; cursor: pointer; width: 100%;
+            box-shadow: 0 4px 15px rgba(6, 182, 212, 0.35);
+            transition: all 0.2s ease;
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(6, 182, 212, 0.5);
+        }
+
+        /* Error Shake Animation */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+
+        .shake {
+            animation: shake 0.4s ease-in-out;
+            border-color: var(--error-color) !important;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.3) !important;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header>
+            <div class="logo-section">
+                <div class="logo-icon">M</div>
+                <div class="logo-text">
+                    <h1>Stage 2: Making the Connection</h1>
+                    <p>Connecting Personal Strengths to Employer Needs</p>
+                </div>
+            </div>
+            <div class="badge">Part 2 Matcher</div>
+        </header>
+
+        <!-- Game Workspace -->
+        <div class="game-layout">
+            <div class="game-intro">
+                <h2>🤝 Joko's Job Match Challenge</h2>
+                <p>Help Joko apply for the <strong>Media Assistant</strong> position at <strong>Media X</strong>. Match the employer's needs from the job advertisement (left) with Joko's corresponding strengths, experience, and academic qualifications (right).</p>
+            </div>
+
+            <!-- Twin Columns -->
+            <div class="matching-board">
+                <!-- Left: Employer Needs -->
+                <div>
+                    <div class="column-title">🏢 Employer Needs (Media X Ad)</div>
+                    <div class="board-column" id="employer-column">
+                        <!-- Filled by JS -->
+                    </div>
+                </div>
+
+                <!-- Right: Joko's Strengths -->
+                <div>
+                    <div class="column-title">👨 Joko's Personal Profile</div>
+                    <div class="board-column" id="joko-column">
+                        <!-- Filled by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactive feedback panel -->
+            <div class="explanation-panel" id="explain-panel">
+                <div class="explanation-text" id="explain-box">
+                    💡 Click an <strong>Employer Need</strong> card on the left, then click Joko's matching <strong>Profile</strong> card on the right!
+                </div>
+            </div>
+
+            <!-- Footer Buttons -->
+            <div class="game-footer">
+                <button class="reset-btn" onclick="resetBoard()">Reset Connections</button>
+                <div style="font-size: 0.85rem; color: #64748b; font-weight: 600;" id="progress-indicator">Matched: 0 / 5</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Victory Modal -->
+    <div class="modal-overlay" id="success-modal">
+        <div class="modal-card">
+            <div class="modal-badge">🤝</div>
+            <div class="modal-title">Luar Biasa! (Fantastic Match!)</div>
+            <div class="modal-body">
+                You successfully matched Joko's strengths and qualifications to the requirements of <strong>Media X</strong>! 
+                <br><br>
+                Joko has proved he is the perfect candidate. He is ready to submit his CV and Cover Letter!
+            </div>
+            <button class="modal-btn" onclick="closeModal()">Back to Board</button>
+        </div>
+    </div>
+
+    <script>
+        // Matching data items based on Page 16 (Media Assistant) and Page 7 (Teresa's/Joko's profiles)
+        const matchPairs = [
+            {
+                id: "pair-1",
+                need: "Well-organised and motivated graduate",
+                strength: "Highly organised, writes daily tasks, and is extremely motivated to work.",
+                explanation: "<strong>Organised & Motivated:</strong> The ad asks for someone systematic. Joko matches this perfectly by keeping a structured, daily task list to stay highly productive and focused."
+            },
+            {
+                id: "pair-2",
+                need: "Excellent communication skills & accurate written English",
+                strength: "Possesses a strong command of communication and speaks/listens very well.",
+                explanation: "<strong>Communication Skills:</strong> Joko's primary transferable skill is communication. He excels at articulating ideas clearly and paying close attention to detail in his written English."
+            },
+            {
+                id: "pair-3",
+                need: "Ability to work cooperatively in a media team",
+                strength: "Enjoys working collaboratively with other people and loves teamwork.",
+                explanation: "<strong>Teamworking Skills:</strong> Supporting the media manager requires excellent cooperative qualities. Joko is a natural collaborator who thrives in creative team settings."
+            },
+            {
+                id: "pair-4",
+                need: "Proficiency in MS Office (training provided for other software)",
+                strength: "Holds basic MS Office proficiency and is a very fast, enthusiastic learner.",
+                explanation: "<strong>MS Office & Training:</strong> Although Joko could improve his Excel skills, his proficiency in MS Office combined with his rapid, proactive learning attitude makes him highly trainable."
+            },
+            {
+                id: "pair-5",
+                need: "Qualification Level: Undergraduate degree is essential",
+                strength: "Recently graduated in 2026 with a BA in Communication.",
+                explanation: "<strong>Undergraduate Degree:</strong> The advertisement lists a university degree as an essential requirement. Joko matches this criterion exactly with his BA degree in Communication."
+            }
+        ];
+
+        let selectedNeedId = null;
+        let selectedProfileId = null;
+        let matchedPairsCount = 0;
+        let audioCtx = null;
+
+        // Custom Sound Generator using Web Audio API (100% Offline)
+        function playSound(type) {
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                const now = audioCtx.currentTime;
+
+                if (type === 'success') {
+                    // Upward arpeggio for correct match
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(440, now); // A4
+                    osc.frequency.setValueAtTime(554.37, now + 0.1); // C#5
+                    osc.frequency.setValueAtTime(659.25, now + 0.2); // E5
+                    osc.frequency.setValueAtTime(880, now + 0.3); // A5
+                    gain.gain.setValueAtTime(0.12, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+                    osc.start(now);
+                    osc.stop(now + 0.55);
+                } else if (type === 'victory') {
+                    // Inspiring chord progression
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(523.25, now); // C5
+                    osc.frequency.setValueAtTime(659.25, now + 0.15); // E5
+                    osc.frequency.setValueAtTime(783.99, now + 0.3); // G5
+                    osc.frequency.setValueAtTime(1046.50, now + 0.45); // C6
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.8);
+                    osc.start(now);
+                    osc.stop(now + 0.85);
+                } else if (type === 'error') {
+                    // Double-beep buzzer
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(120, now);
+                    osc.frequency.setValueAtTime(90, now + 0.15);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.35);
+                } else if (type === 'click') {
+                    // Quick light tick
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(600, now);
+                    gain.gain.setValueAtTime(0.08, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+                    osc.start(now);
+                    osc.stop(now + 0.06);
+                }
+            } catch (e) {
+                console.log("Audio not supported yet:", e);
+            }
+        }
+
+        // Initialize the game layout with randomized arrays
+        function initBoard() {
+            const needColumn = document.getElementById('employer-column');
+            const jokoColumn = document.getElementById('joko-column');
+            
+            needColumn.innerHTML = '';
+            jokoColumn.innerHTML = '';
+            selectedNeedId = null;
+            selectedProfileId = null;
+            matchedPairsCount = 0;
+            updateProgress();
+
+            // Shuffle employer needs and Joko profiles independently
+            const shuffledNeeds = [...matchPairs].sort(() => Math.random() - 0.5);
+            const shuffledProfiles = [...matchPairs].sort(() => Math.random() - 0.5);
+
+            // Populate Employer Needs Column
+            shuffledNeeds.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'match-card';
+                card.id = `need-${item.id}`;
+                card.onclick = () => selectNeed(item.id);
+                card.innerHTML = `
+                    <div class="card-number">${index + 1}</div>
+                    <div class="card-content">${item.need}</div>
+                `;
+                needColumn.appendChild(card);
+            });
+
+            // Populate Joko's Profiles Column
+            shuffledProfiles.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'match-card';
+                card.id = `profile-${item.id}`;
+                card.onclick = () => selectProfile(item.id);
+                card.innerHTML = `
+                    <div class="card-number">${String.fromCharCode(65 + index)}</div>
+                    <div class="card-content">${item.strength}</div>
+                `;
+                jokoColumn.appendChild(card);
+            });
+
+            document.getElementById('explain-box').innerHTML = `💡 Click an <strong>Employer Need</strong> card on the left, then click Joko's matching <strong>Profile</strong> card on the right!`;
+        }
+
+        // Selector logic for Employer Column
+        function selectNeed(id) {
+            if (document.getElementById(`need-${id}`).classList.contains('matched')) return;
+            
+            playSound('click');
+            
+            // Remove selection styling from previous selection
+            if (selectedNeedId) {
+                document.getElementById(`need-${selectedNeedId}`).classList.remove('selected');
+            }
+
+            // Toggle logic
+            if (selectedNeedId === id) {
+                selectedNeedId = null;
+            } else {
+                selectedNeedId = id;
+                document.getElementById(`need-${id}`).classList.add('selected');
+            }
+
+            checkSelections();
+        }
+
+        // Selector logic for Profile Column
+        function selectProfile(id) {
+            if (document.getElementById(`profile-${id}`).classList.contains('matched')) return;
+
+            playSound('click');
+
+            // Remove selection styling from previous selection
+            if (selectedProfileId) {
+                document.getElementById(`profile-${selectedProfileId}`).classList.remove('selected');
+            }
+
+            // Toggle logic
+            if (selectedProfileId === id) {
+                selectedProfileId = null;
+            } else {
+                selectedProfileId = id;
+                document.getElementById(`profile-${id}`).classList.add('selected');
+            }
+
+            checkSelections();
+        }
+
+        // Check if both selections match
+        function checkSelections() {
+            if (selectedNeedId && selectedProfileId) {
+                const needCard = document.getElementById(`need-${selectedNeedId}`);
+                const profileCard = document.getElementById(`profile-${selectedProfileId}`);
+
+                if (selectedNeedId === selectedProfileId) {
+                    // Match Successful!
+                    needCard.classList.remove('selected');
+                    needCard.classList.add('matched');
+                    profileCard.classList.remove('selected');
+                    profileCard.classList.add('matched');
+
+                    const pair = matchPairs.find(item => item.id === selectedNeedId);
+                    document.getElementById('explain-box').innerHTML = pair.explanation;
+
+                    selectedNeedId = null;
+                    selectedProfileId = null;
+                    matchedPairsCount++;
+                    updateProgress();
+
+                    if (matchedPairsCount === matchPairs.length) {
+                        playSound('victory');
+                        setTimeout(triggerVictory, 600);
+                    } else {
+                        playSound('success');
+                    }
+                } else {
+                    // Match Failed - shake cards to notify student
+                    needCard.classList.add('shake');
+                    profileCard.classList.add('shake');
+                    playSound('error');
+
+                    document.getElementById('explain-box').innerHTML = `❌ <strong>Not a match!</strong> That strength does not fit this requirement. Try another pair!`;
+
+                    // Keep cards selected but clear active state in code so they can select a different one
+                    setTimeout(() => {
+                        needCard.classList.remove('shake', 'selected');
+                        profileCard.classList.remove('shake', 'selected');
+                    }, 450);
+
+                    selectedNeedId = null;
+                    selectedProfileId = null;
+                }
+            }
+        }
+
+        function updateProgress() {
+            document.getElementById('progress-indicator').textContent = `Matched: ${matchedPairsCount} / ${matchPairs.length}`;
+        }
+
+        function resetBoard() {
+            initBoard();
+        }
+
+        function triggerVictory() {
+            document.getElementById('success-modal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('success-modal').style.display = 'none';
+        }
+
+        // Load board instantly on page load
+        window.onload = initBoard;
+    </script>
+</body>
+</html>

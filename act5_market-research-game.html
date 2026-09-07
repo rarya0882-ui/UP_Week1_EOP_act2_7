@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stage 2: Market Research Sorting Game</title>
+    <style>
+        :root {
+            --bg-gradient-start: #0a051b;
+            --bg-gradient-end: #0c0d2b;
+            --card-bg: rgba(25, 22, 59, 0.65);
+            --card-border: rgba(99, 102, 241, 0.25);
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --accent-primary: #6366f1; /* Indigo */
+            --accent-secondary: #a855f7; /* Purple */
+            --accent-glow: #06b6d4; /* Cyan */
+            --success-color: #10b981; /* Emerald */
+            --error-color: #ef4444; /* Rose */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 1024px;
+            background: rgba(15, 12, 41, 0.45);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            padding: 25px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            margin-top: 10px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(99, 102, 241, 0.15);
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: white;
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .logo-text h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #ffffff, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text p {
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
+
+        .instructions-card {
+            background: rgba(168, 85, 247, 0.08);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 25px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .instructions-icon {
+            font-size: 2rem;
+        }
+
+        .instructions-text h2 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #d8b4fe;
+            margin-bottom: 4px;
+        }
+
+        .instructions-text p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        /* Sorting Game Layout */
+        .game-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+        }
+
+        /* Word Pool Container */
+        .pool-container {
+            background: rgba(10, 8, 30, 0.6);
+            border: 1px dashed var(--card-border);
+            border-radius: 18px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .pool-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #94a3b8;
+            margin-bottom: 15px;
+        }
+
+        .word-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            min-height: 80px;
+            align-items: center;
+        }
+
+        .pool-card {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(168, 85, 247, 0.15));
+            border: 1.5px solid rgba(99, 102, 241, 0.35);
+            color: var(--text-primary);
+            padding: 10px 18px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            user-select: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        .pool-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent-glow);
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+        }
+
+        .pool-card.selected {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-color: var(--accent-glow);
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
+            transform: scale(1.05);
+        }
+
+        .pool-card.placed {
+            opacity: 0.15;
+            cursor: not-allowed;
+            pointer-events: none;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        /* 4 Categories Grid */
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        @media (max-width: 650px) {
+            .categories-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .category-bucket {
+            background: var(--card-bg);
+            border: 1.5px solid var(--card-border);
+            border-radius: 18px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            transition: all 0.25s ease;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .category-bucket:hover {
+            border-color: rgba(99, 102, 241, 0.6);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.15);
+        }
+
+        .category-bucket.waiting-active {
+            border-color: var(--accent-glow);
+            background: rgba(6, 182, 212, 0.05);
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.1);
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 12px;
+        }
+
+        .category-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .category-meta h3 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .category-meta p {
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
+
+        .dropped-slots {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-height: 150px;
+            justify-content: flex-start;
+        }
+
+        .dropped-card {
+            background: rgba(10, 8, 30, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideIn 0.25s ease-out;
+            cursor: pointer;
+        }
+
+        .dropped-card:hover {
+            border-color: var(--error-color);
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        .dropped-card:hover::after {
+            content: " ❌";
+            font-size: 0.8rem;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dropped-placeholder {
+            color: #475569;
+            font-size: 0.8rem;
+            text-align: center;
+            margin: auto;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        /* Action Footer */
+        .game-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding-top: 20px;
+        }
+
+        .reset-btn {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #94a3b8;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .reset-btn:hover {
+            color: white;
+            border-color: white;
+        }
+
+        .check-btn {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border: none;
+            color: white;
+            padding: 12px 32px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.35);
+            transition: all 0.2s ease;
+        }
+
+        .check-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+        }
+
+        .feedback-banner {
+            margin-top: 20px;
+            padding: 14px 18px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feedback-banner.correct {
+            display: flex;
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            color: #a7f3d0;
+        }
+
+        .feedback-banner.incorrect {
+            display: flex;
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            color: #fca5a5;
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(5, 3, 15, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-card {
+            background: linear-gradient(135deg, #131131, #1e1b4b);
+            border: 1.5px solid rgba(168, 85, 247, 0.35);
+            border-radius: 28px;
+            max-width: 480px;
+            width: 100%;
+            padding: 35px;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+            animation: modalPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes modalPop {
+            from { transform: scale(0.9) translateY(20px); opacity: 0; }
+            to { transform: scale(1) translateY(0); opacity: 1; }
+        }
+
+        .modal-badge {
+            width: 80px; height: 80px;
+            background: radial-gradient(circle, var(--accent-secondary) 0%, rgba(99, 102, 241, 0.4) 100%);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            box-shadow: 0 0 25px rgba(168, 85, 247, 0.45);
+        }
+
+        .modal-title {
+            font-size: 1.5rem; font-weight: 800; margin-bottom: 10px;
+            background: linear-gradient(to right, #fff, #c084fc);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        .modal-body {
+            font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 25px; line-height: 1.5;
+        }
+
+        .modal-btn {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-glow));
+            border: none; color: white; padding: 12px 32px; border-radius: 12px;
+            font-weight: 700; cursor: pointer; width: 100%;
+            box-shadow: 0 4px 15px rgba(6, 182, 212, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        .modal-btn:hover {
+            box-shadow: 0 6px 20px rgba(6, 182, 212, 0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header>
+            <div class="logo-section">
+                <div class="logo-icon">M</div>
+                <div class="logo-text">
+                    <h1>Stage 2: Market Research</h1>
+                    <p>Faculty of Communication • Job Seeking Channels</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Instructions -->
+        <div class="instructions-card">
+            <div class="instructions-icon">🔍</div>
+            <div class="instructions-text">
+                <h2>How to Play:</h2>
+                <p>Joko wants to find out where to find jobs. 1. Tap a <strong>real-life example card</strong> from the pool below. 2. Tap the correct **job search channel category** to assign it. Place 3 examples in each channel!</p>
+            </div>
+        </div>
+
+        <!-- Main Game Work area -->
+        <div class="game-layout">
+            <!-- Pool of Example Words -->
+            <div class="pool-container">
+                <div class="pool-title">Example Job Channels Pool</div>
+                <div class="word-pool" id="items-pool"></div>
+            </div>
+
+            <!-- 4 Categories Grid -->
+            <div class="categories-grid" id="buckets-grid">
+                
+                <!-- Category 1: Internet -->
+                <div class="category-bucket" data-category="internet" onclick="placeItem('internet')">
+                    <div class="category-header">
+                        <div class="category-icon" style="background: rgba(6, 182, 212, 0.1); color: var(--accent-glow);">🌐</div>
+                        <div class="category-meta">
+                            <h3>Internet</h3>
+                            <p>Situs Web / Online Portals</p>
+                        </div>
+                    </div>
+                    <div class="dropped-slots" id="slot-internet">
+                        <div class="dropped-placeholder">Dotted area (No cards placed)</div>
+                    </div>
+                </div>
+
+                <!-- Category 2: Networking -->
+                <div class="category-bucket" data-category="networking" onclick="placeItem('networking')">
+                    <div class="category-header">
+                        <div class="category-icon" style="background: rgba(168, 85, 247, 0.1); color: var(--accent-secondary);">🤝</div>
+                        <div class="category-meta">
+                            <h3>Networking</h3>
+                            <p>Relasi & Rekomendasi</p>
+                        </div>
+                    </div>
+                    <div class="dropped-slots" id="slot-networking">
+                        <div class="dropped-placeholder">Dotted area (No cards placed)</div>
+                    </div>
+                </div>
+
+                <!-- Category 3: Job Agencies -->
+                <div class="category-bucket" data-category="agencies" onclick="placeItem('agencies')">
+                    <div class="category-header">
+                        <div class="category-icon" style="background: rgba(99, 102, 241, 0.1); color: var(--accent-primary);">🏢</div>
+                        <div class="category-meta">
+                            <h3>Job Agencies</h3>
+                            <p>Agensi Lowongan Kerja</p>
+                        </div>
+                    </div>
+                    <div class="dropped-slots" id="slot-agencies">
+                        <div class="dropped-placeholder">Dotted area (No cards placed)</div>
+                    </div>
+                </div>
+
+                <!-- Category 4: News Media -->
+                <div class="category-bucket" data-category="newsmedia" onclick="placeItem('newsmedia')">
+                    <div class="category-header">
+                        <div class="category-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--success-color);">📰</div>
+                        <div class="category-meta">
+                            <h3>News Media</h3>
+                            <p>Media Berita / Cetak</p>
+                        </div>
+                    </div>
+                    <div class="dropped-slots" id="slot-newsmedia">
+                        <div class="dropped-placeholder">Dotted area (No cards placed)</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Feedback and Action Buttons -->
+        <div class="game-footer">
+            <button class="reset-btn" onclick="resetGame()">Reset Game</button>
+            <button class="check-btn" onclick="checkAnswers()">Verify Placements</button>
+        </div>
+        <div class="feedback-banner" id="verification-feedback"></div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal-overlay" id="victory-modal">
+        <div class="modal-card">
+            <div class="modal-badge">🎯</div>
+            <div class="modal-title">Luar Biasa! (Fantastic!)</div>
+            <div class="modal-body">You successfully identified the 4 main channels for market research and categorized their real-life examples correctly! Your students are ready for the job market.</div>
+            <button class="modal-btn" onclick="closeVictoryModal()">Return to Board</button>
+        </div>
+    </div>
+
+    <script>
+        // Real-world examples mapped to their categories
+        const gameItems = [
+            // Internet
+            { id: "item1", text: "LinkedIn Profile", category: "internet" },
+            { id: "item2", text: "JobStreet Portal", category: "internet" },
+            { id: "item3", text: "Company Career Website", category: "internet" },
+            // Networking
+            { id: "item4", text: "University Alumni Group", category: "networking" },
+            { id: "item5", text: "Professor's Referral", category: "networking" },
+            { id: "item6", text: "Former Internship Boss", category: "networking" },
+            // Job Agencies
+            { id: "item7", text: "Campus Career Center Office", category: "agencies" },
+            { id: "item8", text: "Headhunter Executive Recruiter", category: "agencies" },
+            { id: "item9", text: "Professional Job Agency Office", category: "agencies" },
+            // News Media
+            { id: "item10", text: "The Guardian Career Ad", category: "newsmedia" },
+            { id: "item11", text: "Kompas Classified Newspaper Section", category: "newsmedia" },
+            { id: "item12", text: "Koran Tempo Career Page", category: "newsmedia" }
+        ];
+
+        let selectedItem = null;
+        let placements = {
+            internet: [],
+            networking: [],
+            agencies: [],
+            newsmedia: []
+        };
+
+        let audioCtx = null;
+
+        function playSound(type) {
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                const now = audioCtx.currentTime;
+
+                if (type === 'success') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, now); // C5
+                    osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
+                    osc.frequency.setValueAtTime(783.99, now + 0.16); // G5
+                    osc.frequency.setValueAtTime(1046.50, now + 0.24); // C6
+                    gain.gain.setValueAtTime(0.12, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.45);
+                    osc.start(now);
+                    osc.stop(now + 0.45);
+                } else if (type === 'error') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(160, now);
+                    osc.frequency.exponentialRampToValueAtTime(100, now + 0.3);
+                    gain.gain.setValueAtTime(0.12, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.35);
+                } else if (type === 'tap') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(440, now); // A4
+                    gain.gain.setValueAtTime(0.08, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                    osc.start(now);
+                    osc.stop(now + 0.12);
+                }
+            } catch (e) {
+                console.log("Audio Context Error: ", e);
+            }
+        }
+
+        // Initialize / Shuffle Pool
+        function initGame() {
+            const poolEl = document.getElementById('items-pool');
+            poolEl.innerHTML = '';
+            selectedItem = null;
+            placements = { internet: [], networking: [], agencies: [], newsmedia: [] };
+
+            // Shuffle cards
+            const shuffledItems = [...gameItems].sort(() => Math.random() - 0.5);
+
+            shuffledItems.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'pool-card';
+                card.id = item.id;
+                card.textContent = item.text;
+                card.onclick = (e) => {
+                    e.stopPropagation();
+                    selectCard(item);
+                };
+                poolEl.appendChild(card);
+            });
+
+            // Refresh buckets rendering
+            renderBuckets();
+            document.getElementById('verification-feedback').style.display = 'none';
+        }
+
+        function selectCard(item) {
+            playSound('tap');
+            // Remove selection class from others
+            document.querySelectorAll('.pool-card').forEach(c => c.classList.remove('selected'));
+            
+            if (selectedItem && selectedItem.id === item.id) {
+                selectedItem = null; // deselect
+                document.querySelectorAll('.category-bucket').forEach(b => b.classList.remove('waiting-active'));
+            } else {
+                selectedItem = item;
+                document.getElementById(item.id).classList.add('selected');
+                // Highlight buckets
+                document.querySelectorAll('.category-bucket').forEach(b => b.classList.add('waiting-active'));
+            }
+        }
+
+        function placeItem(category) {
+            if (!selectedItem) return;
+
+            // Prevent adding more than 3 cards per bucket
+            if (placements[category].length >= 3) {
+                playSound('error');
+                showImmediateFeedback("⚠️ Each category can only hold exactly 3 examples!", false);
+                return;
+            }
+
+            // Move from pool to the placements list
+            placements[category].push(selectedItem);
+            
+            // Mark card in the pool as placed
+            const cardInPool = document.getElementById(selectedItem.id);
+            cardInPool.classList.add('placed');
+            cardInPool.classList.remove('selected');
+
+            selectedItem = null;
+            // De-highlight buckets
+            document.querySelectorAll('.category-bucket').forEach(b => b.classList.remove('waiting-active'));
+
+            playSound('tap');
+            renderBuckets();
+        }
+
+        function removeItem(category, idx) {
+            playSound('tap');
+            const removedItem = placements[category].splice(idx, 1)[0];
+            
+            // Return to pool (make it clickable/visible again)
+            const cardInPool = document.getElementById(removedItem.id);
+            cardInPool.classList.remove('placed');
+
+            renderBuckets();
+        }
+
+        function renderBuckets() {
+            const categories = ['internet', 'networking', 'agencies', 'newsmedia'];
+            categories.forEach(cat => {
+                const container = document.getElementById(`slot-${cat}`);
+                container.innerHTML = '';
+
+                if (placements[cat].length === 0) {
+                    const placeholder = document.createElement('div');
+                    placeholder.className = 'dropped-placeholder';
+                    placeholder.textContent = "Click a card above, then click here.";
+                    container.appendChild(placeholder);
+                } else {
+                    placements[cat].forEach((item, index) => {
+                        const card = document.createElement('div');
+                        card.className = 'dropped-card';
+                        card.textContent = item.text;
+                        card.onclick = (e) => {
+                            e.stopPropagation();
+                            removeItem(cat, index);
+                        };
+                        container.appendChild(card);
+                    });
+                }
+            });
+        }
+
+        function showImmediateFeedback(msg, isSuccess) {
+            const fb = document.getElementById('verification-feedback');
+            fb.style.display = 'flex';
+            fb.className = isSuccess ? 'feedback-banner correct' : 'feedback-banner incorrect';
+            fb.innerHTML = (isSuccess ? '✅ ' : '') + msg;
+        }
+
+        function checkAnswers() {
+            let totalPlaced = 0;
+            let allCorrect = true;
+
+            const categories = ['internet', 'networking', 'agencies', 'newsmedia'];
+            
+            categories.forEach(cat => {
+                totalPlaced += placements[cat].length;
+                placements[cat].forEach(item => {
+                    if (item.category !== cat) {
+                        allCorrect = false;
+                    }
+                });
+            });
+
+            if (totalPlaced < 12) {
+                playSound('error');
+                showImmediateFeedback("❌ Please place all 12 example cards into their categories before checking!", false);
+                return;
+            }
+
+            if (allCorrect) {
+                playSound('success');
+                showImmediateFeedback("Excellent! All 12 real-life examples are correctly categorized under their proper job search channels.", true);
+                setTimeout(() => {
+                    document.getElementById('victory-modal').style.display = 'flex';
+                }, 800);
+            } else {
+                playSound('error');
+                showImmediateFeedback("❌ Some examples are in the wrong categories. Click a card in a bucket to remove it, and try again!", false);
+            }
+        }
+
+        function resetGame() {
+            initGame();
+        }
+
+        function closeVictoryModal() {
+            document.getElementById('victory-modal').style.display = 'none';
+        }
+
+        // Run
+        window.onload = () => {
+            initGame();
+        };
+    </script>
+</body>
+</html>

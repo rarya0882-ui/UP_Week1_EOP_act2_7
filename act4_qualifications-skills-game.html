@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qualifications & Skills Grammar Game</title>
+    <style>
+        /* Modern, Faculty of Communication Glassmorphic Palette */
+        :root {
+            --bg-gradient-start: #0a051b;
+            --bg-gradient-end: #0c0d2b;
+            --card-bg: rgba(25, 22, 59, 0.65);
+            --card-border: rgba(99, 102, 241, 0.25);
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --accent-primary: #6366f1; /* Indigo */
+            --accent-secondary: #a855f7; /* Purple */
+            --accent-glow: #06b6d4; /* Cyan */
+            --success-color: #10b981; /* Emerald */
+            --error-color: #ef4444; /* Rose */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            padding: 20px;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 680px;
+            background: rgba(15, 12, 41, 0.45);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Header logo style matching prior apps */
+        header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(99, 102, 241, 0.15);
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: white;
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .logo-text h1 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #ffffff, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.3px;
+        }
+
+        .logo-text p {
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            margin-bottom: 25px;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #94a3b8;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 10%;
+            background: linear-gradient(to right, var(--accent-primary), var(--accent-glow));
+            border-radius: 4px;
+            transition: width 0.4s ease;
+        }
+
+        /* Question Workspace */
+        .question-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 25px;
+        }
+
+        .question-badge {
+            align-self: flex-start;
+            background: rgba(168, 85, 247, 0.15);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            color: #d8b4fe;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+
+        .question-text {
+            font-size: 1.15rem;
+            font-weight: 600;
+            line-height: 1.6;
+            color: var(--text-primary);
+        }
+
+        .blank-space {
+            color: var(--accent-glow);
+            font-weight: 800;
+            text-decoration: underline;
+            padding: 0 4px;
+        }
+
+        /* Multiple Choice Option Buttons */
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .option-btn {
+            background: rgba(15, 12, 41, 0.6);
+            border: 1.5px solid rgba(255, 255, 255, 0.08);
+            color: var(--text-primary);
+            padding: 16px 20px;
+            border-radius: 14px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            background: rgba(99, 102, 241, 0.12);
+            border-color: var(--accent-primary);
+            transform: translateX(4px);
+        }
+
+        .option-btn:disabled {
+            cursor: not-allowed;
+        }
+
+        .option-letter {
+            width: 28px;
+            height: 28px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1.5px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: #94a3b8;
+            flex-shrink: 0;
+            transition: all 0.2s ease;
+        }
+
+        /* State Classes */
+        .option-btn.correct {
+            background: rgba(16, 185, 129, 0.12) !important;
+            border-color: var(--success-color) !important;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.25);
+        }
+
+        .option-btn.correct .option-letter {
+            background: var(--success-color);
+            border-color: var(--success-color);
+            color: white;
+        }
+
+        .option-btn.incorrect {
+            background: rgba(239, 68, 68, 0.12) !important;
+            border-color: var(--error-color) !important;
+            animation: shake 0.4s ease-in-out;
+        }
+
+        .option-btn.incorrect .option-letter {
+            background: var(--error-color);
+            border-color: var(--error-color);
+            color: white;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+
+        /* Explanation & feedback Card */
+        .feedback-card {
+            background: rgba(16, 185, 129, 0.08);
+            border: 1.5px solid rgba(16, 185, 129, 0.25);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 25px;
+            display: none;
+            animation: slideDown 0.35s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .feedback-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #a7f3d0;
+            margin-bottom: 10px;
+        }
+
+        .feedback-explanation {
+            font-size: 0.88rem;
+            line-height: 1.5;
+            color: var(--text-secondary);
+        }
+
+        /* Next Button container */
+        .action-container {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .next-btn {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border: none;
+            color: white;
+            padding: 14px 32px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.35);
+            transition: all 0.2s ease;
+            display: none; /* Shown only on correct answer */
+        }
+
+        .next-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45);
+        }
+
+        /* Victory modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(5, 3, 15, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-card {
+            background: linear-gradient(135deg, #131131, #1e1b4b);
+            border: 1.5px solid rgba(168, 85, 247, 0.35);
+            border-radius: 28px;
+            max-width: 480px;
+            width: 100%;
+            padding: 35px;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6);
+            animation: zoomIn 0.3s ease-out;
+        }
+
+        @keyframes zoomIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-badge {
+            width: 80px; height: 80px;
+            background: radial-gradient(circle, var(--accent-secondary) 0%, rgba(99, 102, 241, 0.4) 100%);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            box-shadow: 0 0 25px rgba(168, 85, 247, 0.45);
+        }
+
+        .modal-title {
+            font-size: 1.5rem; font-weight: 800; margin-bottom: 10px;
+            background: linear-gradient(to right, #fff, #c084fc);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        .modal-body {
+            font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 25px; line-height: 1.5;
+        }
+
+        .modal-btn {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-glow));
+            border: none; color: white; padding: 12px 32px; border-radius: 12px;
+            font-weight: 700; cursor: pointer; width: 100%;
+            transition: all 0.2s ease;
+        }
+
+        .modal-btn:hover {
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Header logo section -->
+        <header>
+            <div class="logo-icon">Q</div>
+            <div class="logo-text">
+                <h1>Qualifications & Skills Practice</h1>
+                <p>Grammar and Preposition Matching Game</p>
+            </div>
+        </header>
+
+        <!-- Progress Tracker -->
+        <div class="progress-container">
+            <div class="progress-label">
+                <span>Grammar Skills Check</span>
+                <span id="progress-text">Question 1 of 10</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-indicator" style="width: 10%"></div>
+            </div>
+        </div>
+
+        <!-- Question Workspace -->
+        <div class="question-card">
+            <div class="question-badge" id="question-badge-el">Section 1: Academic Degrees</div>
+            <div class="question-text" id="question-text-el">
+                I <span class="blank-space">______</span> a BA in Communication from Universitas Pancasila.
+            </div>
+        </div>
+
+        <!-- Multiple Choice Options -->
+        <div class="options-list" id="options-container">
+            <!-- Programmatically injected -->
+        </div>
+
+        <!-- Correct answer Feedback explanation card -->
+        <div class="feedback-card" id="explanation-card">
+            <div class="feedback-header">
+                <span>🎉 Betul! (Correct!)</span>
+            </div>
+            <div class="feedback-explanation" id="explanation-text">
+                "We use 'hold' to mean we have or possess an academic degree or qualification."
+            </div>
+        </div>
+
+        <!-- Next question Trigger button -->
+        <div class="action-container">
+            <button class="next-btn" id="next-action-btn" onclick="moveToNextQuestion()">Next Question ▶</button>
+        </div>
+    </div>
+
+    <!-- Celebration completion Modal -->
+    <div class="modal-overlay" id="completion-modal">
+        <div class="modal-card">
+            <div class="modal-badge">🏆</div>
+            <div class="modal-title">Luar Biasa! (Fantastic!)</div>
+            <div class="modal-body">
+                You successfully answered all 10 grammar exercises on academic qualifications and transferable skills. You are now fully prepared to write your job applications!
+            </div>
+            <button class="modal-btn" onclick="restartSession()">Restart Practice</button>
+        </div>
+    </div>
+
+    <script>
+        const quizDatabase = [
+            {
+                section: "Academic Degrees",
+                question: "I <span class=\"blank-space\">______</span> a BA in Communication from Universitas Pancasila.",
+                options: [
+                    { letter: "A", text: "hold", isCorrect: true },
+                    { letter: "B", text: "read", isCorrect: false },
+                    { letter: "C", text: "graduated", isCorrect: false }
+                ],
+                explanation: "We use the verb <strong>'hold'</strong> to state that we have or possess an academic degree (e.g., <i>'I hold a BA in...'</i>). In the sources, Teresa Fernandez mentions she <i>holds</i> a degree [10]."
+            },
+            {
+                section: "University Studies",
+                question: "Joko <span class=\"blank-space\">______</span> Journalism at university because he loves media production.",
+                options: [
+                    { letter: "A", text: "obtained", isCorrect: false },
+                    { letter: "B", text: "read", isCorrect: true },
+                    { letter: "C", text: "graduated", isCorrect: false }
+                ],
+                explanation: "In British academic English, the verb <strong>'read'</strong> means to study a specific subject at a university (e.g., <i>'I read Chemistry at Oxford'</i>) [10]."
+            },
+            {
+                section: "Academic Prepositions",
+                question: "Teresa Fernandez graduated <span class=\"blank-space\">______</span> Kingston University with a degree in Psychology.",
+                options: [
+                    { letter: "A", text: "in", isCorrect: false },
+                    { letter: "B", text: "with", isCorrect: false },
+                    { letter: "C", text: "from", isCorrect: true }
+                ],
+                explanation: "We always use the preposition <strong>'from'</strong> when mentioning the name of the academic institution we finished (e.g., <i>'graduated from Harvard / graduated from Universitas Pancasila'</i>) [10]."
+            },
+            {
+                section: "Academic Prepositions",
+                question: "She graduated <span class=\"blank-space\">______</span> Psychology, which is the study of human nature.",
+                options: [
+                    { letter: "A", text: "in", isCorrect: true },
+                    { letter: "B", text: "at", isCorrect: false },
+                    { letter: "C", text: "with", isCorrect: false }
+                ],
+                explanation: "We use the preposition <strong>'in'</strong> to indicate our field of study, major, or subject department (e.g., <i>'graduated in Communication'</i>) [10]."
+            },
+            {
+                section: "Academic Prepositions",
+                question: "Joko graduated <span class=\"blank-space\">______</span> a BA in Mass Communication last month.",
+                options: [
+                    { letter: "A", text: "in", isCorrect: false },
+                    { letter: "B", text: "with", isCorrect: true },
+                    { letter: "C", text: "from", isCorrect: false }
+                ],
+                explanation: "We use the preposition <strong>'with'</strong> before the formal title of our degree qualification (e.g., <i>'graduated with a BA / with a Master of Arts'</i>) [10]."
+            },
+            {
+                section: "Job Field Prepositions",
+                question: "Joko started his career <span class=\"blank-space\">______</span> marketing after completing his internship.",
+                options: [
+                    { letter: "A", text: "in", isCorrect: true },
+                    { letter: "B", text: "at", isCorrect: false },
+                    { letter: "C", text: "with", isCorrect: false }
+                ],
+                explanation: "We say <strong>'started a career in'</strong> followed by the industry name, field, or department (e.g., <i>'in media, in hospitality, in marketing'</i>) [10]."
+            },
+            {
+                section: "Responsibilities",
+                question: "At university, Joko was responsible <span class=\"blank-space\">______</span> organizing creative workshops.",
+                options: [
+                    { letter: "A", text: "at", isCorrect: false },
+                    { letter: "B", text: "to", isCorrect: false },
+                    { letter: "C", text: "for", isCorrect: true }
+                ],
+                explanation: "We say <strong>'responsible for'</strong> followed by an <i>-ing</i> verb (gerund) or noun to describe tasks we had full control of [12]."
+            },
+            {
+                section: "Skills Grammar",
+                question: "As a communication student, Joko is excellent <span class=\"blank-space\">______</span> public speaking.",
+                options: [
+                    { letter: "A", text: "at", isCorrect: true },
+                    { letter: "B", text: "in", isCorrect: false },
+                    { letter: "C", text: "to", isCorrect: false }
+                ],
+                explanation: "We say we are <strong>'excellent at'</strong> or <strong>'good at'</strong> something to highlight our strengths and transferable skills [9]."
+            },
+            {
+                section: "Skills Grammar",
+                question: "Modern media employers look for candidates who are able <span class=\"blank-space\">______</span> under tight deadlines.",
+                options: [
+                    { letter: "A", text: "working", isCorrect: false },
+                    { letter: "B", text: "to work", isCorrect: true },
+                    { letter: "C", text: "work", isCorrect: false }
+                ],
+                explanation: "The structure <strong>'able to'</strong> must always be followed by the base infinitive form of the verb (V1) (e.g., <i>'able to work, able to coordinate'</i>) [9]."
+            },
+            {
+                section: "Interests and Passions",
+                question: "I am very interested <span class=\"blank-space\">______</span> applying for the Media Assistant position.",
+                options: [
+                    { letter: "A", text: "at", isCorrect: false },
+                    { letter: "B", text: "on", isCorrect: false },
+                    { letter: "C", text: "in", isCorrect: true }
+                ],
+                explanation: "The phrase <strong>'interested in'</strong> is the standard prepositional collocation used to express our passions, goals, and interests [9]."
+            }
+        ];
+
+        let activeQuestionIndex = 0;
+        let isCurrentQuestionAnswered = false;
+        let soundEngine = null;
+
+        function triggerSfx(soundType) {
+            try {
+                if (!soundEngine) soundEngine = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = soundEngine.createOscillator();
+                const nodeGain = soundEngine.createGain();
+                osc.connect(nodeGain);
+                nodeGain.connect(soundEngine.destination);
+                const currentTime = soundEngine.currentTime;
+
+                if (soundType === 'correct') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, currentTime); // C5
+                    osc.frequency.setValueAtTime(659.25, currentTime + 0.08); // E5
+                    osc.frequency.setValueAtTime(783.99, currentTime + 0.16); // G5
+                    osc.frequency.setValueAtTime(1046.50, currentTime + 0.24); // C6
+                    nodeGain.gain.setValueAtTime(0.15, currentTime);
+                    nodeGain.gain.exponentialRampToValueAtTime(0.01, currentTime + 0.45);
+                    osc.start(currentTime);
+                    osc.stop(currentTime + 0.5);
+                } else if (soundType === 'incorrect') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(130.81, currentTime); // C3
+                    osc.frequency.exponentialRampToValueAtTime(82.41, currentTime + 0.3); // E2
+                    nodeGain.gain.setValueAtTime(0.12, currentTime);
+                    nodeGain.gain.exponentialRampToValueAtTime(0.01, currentTime + 0.3);
+                    osc.start(currentTime);
+                    osc.stop(currentTime + 0.35);
+                }
+            } catch (err) {
+                console.log("Web Audio API is not fully supported or active:", err);
+            }
+        }
+
+        function loadQuestion() {
+            isCurrentQuestionAnswered = false;
+            const data = quizDatabase[activeQuestionIndex];
+            
+            // Render text trackers
+            document.getElementById('progress-text').textContent = `Question ${activeQuestionIndex + 1} of 10`;
+            document.getElementById('progress-indicator').style.width = `${((activeQuestionIndex + 1) / quizDatabase.length) * 100}%`;
+            document.getElementById('question-badge-el').textContent = `Section: ${data.section}`;
+            document.getElementById('question-text-el').innerHTML = data.question;
+
+            // Render option buttons
+            const optBox = document.getElementById('options-container');
+            optBox.innerHTML = '';
+
+            data.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerHTML = `<div class="option-letter">${opt.letter}</div><div>${opt.text}</div>`;
+                btn.onclick = () => verifyAnswer(btn, opt.isCorrect);
+                optBox.appendChild(btn);
+            });
+
+            // Hide explanation & next button until answer is correct
+            document.getElementById('explanation-card').style.display = 'none';
+            document.getElementById('next-action-btn').style.display = 'none';
+        }
+
+        function verifyAnswer(buttonElement, isCorrect) {
+            if (isCurrentQuestionAnswered) return; // Disallows clicks if already passed
+
+            if (isCorrect) {
+                isCurrentQuestionAnswered = true;
+                buttonElement.classList.add('correct');
+                triggerSfx('correct');
+
+                // Disable non-selected option elements
+                const otherButtons = document.querySelectorAll('.option-btn');
+                otherButtons.forEach(btn => {
+                    if (!btn.classList.contains('correct')) {
+                        btn.disabled = true;
+                        btn.style.opacity = '0.4';
+                    }
+                });
+
+                // Display grammar explanation block & next button
+                const data = quizDatabase[activeQuestionIndex];
+                document.getElementById('explanation-text').innerHTML = data.explanation;
+                document.getElementById('explanation-card').style.display = 'block';
+                document.getElementById('next-action-btn').style.display = 'block';
+            } else {
+                // Shake and color selected incorrect button
+                buttonElement.classList.add('incorrect');
+                triggerSfx('incorrect');
+                
+                // Allow them to click other options by stripping incorrect class after anim finishes
+                setTimeout(() => {
+                    buttonElement.classList.remove('incorrect');
+                    buttonElement.style.opacity = '0.35';
+                }, 400);
+            }
+        }
+
+        function moveToNextQuestion() {
+            if (activeQuestionIndex < quizDatabase.length - 1) {
+                activeQuestionIndex++;
+                loadQuestion();
+            } else {
+                document.getElementById('completion-modal').style.display = 'flex';
+                triggerSfx('correct');
+            }
+        }
+
+        function restartSession() {
+            activeQuestionIndex = 0;
+            document.getElementById('completion-modal').style.display = 'none';
+            loadQuestion();
+        }
+
+        // Initialize quiz workspace on load
+        window.onload = loadQuestion;
+    </script>
+</body>
+</html>

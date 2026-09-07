@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Learning Activities Hub</title>
+    <style>
+        /* ─── GLOBAL RESET & THEME ─── */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --bg-start: #080518;
+            --bg-end: #0b0c24;
+            --card-bg: rgba(21, 18, 48, 0.7);
+            --card-border: rgba(99, 102, 241, 0.25);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-indigo: #6366f1;
+            --accent-purple: #a855f7;
+            --accent-cyan: #06b6d4;
+            --accent-green: #10b981;
+            --accent-rose: #ef4444;
+            --shadow-glow: 0 0 30px rgba(99, 102, 241, 0.15);
+        }
+
+        html,
+        body {
+            height: 100%;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, var(--bg-start), var(--bg-end));
+            color: var(--text-primary);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* ─── MAIN CONTAINER ─── */
+        .app-container {
+            width: 100%;
+            max-width: 1200px;
+            background: rgba(15, 12, 41, 0.45);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 28px;
+            padding: 28px 30px 30px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 90vh;
+            max-height: 98vh;
+        }
+
+        /* ─── HEADER ─── */
+        .hub-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(99, 102, 241, 0.15);
+            padding-bottom: 18px;
+            margin-bottom: 22px;
+            flex-shrink: 0;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--accent-indigo), var(--accent-purple));
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #fff;
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.35);
+        }
+
+        .brand h1 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #fff, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.4px;
+        }
+
+        .brand span {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+            -webkit-text-fill-color: var(--text-secondary);
+            background: none;
+            display: block;
+            margin-top: 1px;
+        }
+
+        .menu-status {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--accent-cyan);
+            background: rgba(6, 182, 212, 0.08);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            padding: 6px 16px;
+            border-radius: 40px;
+            letter-spacing: 0.3px;
+        }
+
+        /* ─── MAIN LAYOUT: MENU + IFRAME ─── */
+        .hub-body {
+            display: flex;
+            gap: 28px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        /* ─── SIDEBAR MENU ─── */
+        .menu-sidebar {
+            width: 260px;
+            flex-shrink: 0;
+            background: rgba(10, 8, 30, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 20px;
+            padding: 18px 14px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .menu-sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .menu-sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .menu-sidebar::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.3);
+            border-radius: 10px;
+        }
+
+        .menu-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+            padding: 8px 10px 4px;
+            font-weight: 700;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            background: transparent;
+            width: 100%;
+            text-align: left;
+        }
+
+        .menu-item:hover {
+            background: rgba(99, 102, 241, 0.08);
+            border-color: rgba(99, 102, 241, 0.15);
+            color: #fff;
+            transform: translateX(4px);
+        }
+
+        .menu-item.active {
+            background: rgba(99, 102, 241, 0.12);
+            border-color: var(--accent-indigo);
+            color: #fff;
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.08);
+        }
+
+        .menu-item .emoji {
+            font-size: 1.2rem;
+            width: 28px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .menu-item .badge-num {
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 30px;
+            padding: 0 8px;
+            font-size: 0.6rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin-left: auto;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .menu-item.active .badge-num {
+            background: var(--accent-indigo);
+            color: #fff;
+            border-color: var(--accent-indigo);
+        }
+
+        /* ─── IFRAME AREA ─── */
+        .iframe-wrapper {
+            flex: 1;
+            background: rgba(5, 3, 15, 0.4);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            overflow: hidden;
+            position: relative;
+            min-height: 400px;
+        }
+
+        .iframe-wrapper iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: #0b0c24;
+            display: block;
+        }
+
+        .placeholder-view {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            min-height: 400px;
+            text-align: center;
+            padding: 40px;
+            gap: 16px;
+        }
+
+        .placeholder-view .big-icon {
+            font-size: 4.5rem;
+            animation: pulse-float 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse-float {
+            0%,
+            100% {
+                transform: translateY(0) scale(1);
+            }
+            50% {
+                transform: translateY(-10px) scale(1.04);
+            }
+        }
+
+        .placeholder-view h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #e2e8f0;
+        }
+
+        .placeholder-view p {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            max-width: 380px;
+            line-height: 1.6;
+        }
+
+        .placeholder-view .highlight {
+            color: var(--accent-cyan);
+            font-weight: 600;
+        }
+
+        /* ─── RESPONSIVE ─── */
+        @media (max-width: 820px) {
+            .app-container {
+                padding: 18px;
+                max-height: none;
+                min-height: auto;
+            }
+            .hub-body {
+                flex-direction: column;
+                gap: 18px;
+            }
+            .menu-sidebar {
+                width: 100%;
+                flex-direction: row;
+                flex-wrap: wrap;
+                padding: 12px;
+                gap: 4px;
+                max-height: 160px;
+                overflow-y: auto;
+            }
+            .menu-label {
+                width: 100%;
+                padding: 4px 8px;
+            }
+            .menu-item {
+                padding: 8px 12px;
+                font-size: 0.78rem;
+                flex: 0 0 auto;
+                width: auto;
+            }
+            .menu-item .badge-num {
+                display: none;
+            }
+            .iframe-wrapper {
+                min-height: 500px;
+            }
+            .placeholder-view {
+                min-height: 300px;
+                padding: 24px;
+            }
+            .placeholder-view .big-icon {
+                font-size: 3rem;
+            }
+            .brand h1 {
+                font-size: 1.1rem;
+            }
+            .menu-status {
+                font-size: 0.65rem;
+                padding: 4px 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .app-container {
+                padding: 12px;
+                border-radius: 18px;
+            }
+            .hub-header {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            .brand-icon {
+                width: 34px;
+                height: 34px;
+                font-size: 1rem;
+            }
+            .brand h1 {
+                font-size: 0.95rem;
+            }
+            .brand span {
+                font-size: 0.65rem;
+            }
+            .menu-sidebar {
+                max-height: 120px;
+                padding: 8px;
+            }
+            .menu-item {
+                padding: 6px 10px;
+                font-size: 0.7rem;
+                gap: 6px;
+            }
+            .menu-item .emoji {
+                font-size: 0.9rem;
+                width: 20px;
+            }
+            .iframe-wrapper {
+                min-height: 380px;
+                border-radius: 14px;
+            }
+        }
+
+        /* scrollbar for whole app */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.25);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(99, 102, 241, 0.4);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- ─── HEADER ─── -->
+        <header class="hub-header">
+            <div class="brand">
+                <div class="brand-icon">🎯</div>
+                <div>
+                    <h1>Learning Activities Hub</h1>
+                    <span>Faculty of Communication · Career Readiness</span>
+                </div>
+            </div>
+            <div class="menu-status" id="statusBadge">📋 Main Menu</div>
+        </header>
+
+        <!-- ─── BODY ─── -->
+        <div class="hub-body">
+
+            <!-- SIDEBAR MENU -->
+            <nav class="menu-sidebar" id="menuSidebar">
+                <div class="menu-label">📂 Activities</div>
+
+                <!-- Main Menu -->
+                <button class="menu-item active" data-index="0" onclick="loadActivity(0)">
+                    <span class="emoji">🏠</span> Main Menu
+                    <span class="badge-num">0</span>
+                </button>
+                <!-- Act 2: Vocab Builder -->
+                <button class="menu-item" data-index="1" onclick="loadActivity(1)">
+                    <span class="emoji">📖</span> Vocab Builder
+                    <span class="badge-num">2</span>
+                </button>
+                <!-- Act 3: Mind Map -->
+                <button class="menu-item" data-index="2" onclick="loadActivity(2)">
+                    <span class="emoji">🧠</span> Mind Map
+                    <span class="badge-num">3</span>
+                </button>
+                <!-- Act 4: Qualifications -->
+                <button class="menu-item" data-index="3" onclick="loadActivity(3)">
+                    <span class="emoji">🎓</span> Qualifications
+                    <span class="badge-num">4</span>
+                </button>
+                <!-- Act 5: Market Research -->
+                <button class="menu-item" data-index="4" onclick="loadActivity(4)">
+                    <span class="emoji">🔍</span> Market Research
+                    <span class="badge-num">5</span>
+                </button>
+                <!-- Act 6: Job Decoder -->
+                <button class="menu-item" data-index="5" onclick="loadActivity(5)">
+                    <span class="emoji">🖨️</span> Job Decoder
+                    <span class="badge-num">6</span>
+                </button>
+                <!-- Act 7: Skill Matcher -->
+                <button class="menu-item" data-index="6" onclick="loadActivity(6)">
+                    <span class="emoji">🤝</span> Skill Matcher
+                    <span class="badge-num">7</span>
+                </button>
+            </nav>
+
+            <!-- IFRAME CONTAINER -->
+            <div class="iframe-wrapper" id="iframeWrapper">
+                <!-- Placeholder shown when no activity is loaded -->
+                <div class="placeholder-view" id="placeholderView">
+                    <div class="big-icon">🚀</div>
+                    <h2>Welcome to Your Learning Hub</h2>
+                    <p>
+                        Select an activity from the sidebar to begin. Each interactive exercise
+                        is designed to build your <span class="highlight">career readiness</span>
+                        and <span class="highlight">self-research</span> skills.
+                    </p>
+                    <p style="font-size:0.8rem;color:#64748b;margin-top:4px;">
+                        👉 All activities include a <strong>"Back to Main Menu"</strong> button
+                    </p>
+                </div>
+
+                <!-- iframe (hidden by default) -->
+                <iframe id="activityFrame" style="display:none;"></iframe>
+            </div>
+
+        </div><!-- /hub-body -->
+    </div><!-- /app-container -->
+
+    <script>
+        // ─── ACTIVITY CONFIGURATION ───
+        // Each entry: file path (relative) and display label.
+        // Index 0 is the main menu (placeholder), indices 1-6 correspond to Act 2-7.
+        const ACTIVITIES = [
+            { id: 'menu', title: 'Main Menu', file: null, emoji: '🏠' },
+            { id: 'vocab', title: 'Vocab Builder', file: 'act2_vocab_game.html', emoji: '📖' },
+            { id: 'mindmap', title: 'Mind Map', file: 'act3_mindmap.html', emoji: '🧠' },
+            { id: 'qual', title: 'Qualifications', file: 'act4_qualifications-skills-game.html', emoji: '🎓' },
+            { id: 'market', title: 'Market Research', file: 'act5_market-research-game.html', emoji: '🔍' },
+            { id: 'decoder', title: 'Job Decoder', file: 'act6_job-ad-decoder.html', emoji: '🖨️' },
+            { id: 'matcher', title: 'Skill Matcher', file: 'act7_skills-matcher.html', emoji: '🤝' }
+        ];
+
+        let currentIndex = 0;
+        const frame = document.getElementById('activityFrame');
+        const placeholder = document.getElementById('placeholderView');
+        const statusBadge = document.getElementById('statusBadge');
+
+        // ─── LOAD ACTIVITY ───
+        function loadActivity(index) {
+            if (index < 0 || index >= ACTIVITIES.length) index = 0;
+
+            const activity = ACTIVITIES[index];
+            currentIndex = index;
+
+            // Update menu highlight
+            document.querySelectorAll('.menu-item').forEach((btn, i) => {
+                btn.classList.toggle('active', i === index);
+            });
+
+            // Update status badge
+            statusBadge.textContent = index === 0 ? '📋 Main Menu' : `▶ ${activity.emoji} ${activity.title}`;
+
+            // If main menu (index 0) → show placeholder, hide iframe
+            if (index === 0) {
+                frame.style.display = 'none';
+                placeholder.style.display = 'flex';
+                return;
+            }
+
+            // Otherwise load the activity in iframe
+            placeholder.style.display = 'none';
+            frame.style.display = 'block';
+
+            const filePath = activity.file;
+            if (!filePath) {
+                frame.style.display = 'none';
+                placeholder.style.display = 'flex';
+                return;
+            }
+
+            // Set iframe src with cache buster
+            frame.src = filePath + '?t=' + Date.now();
+        }
+
+        // ─── POST-MESSAGE HANDLER ───
+        // Activities send { action: 'backToMenu' } to return to main menu.
+        window.addEventListener('message', function(e) {
+            if (e.origin !== window.location.origin) return;
+            if (e.data && e.data.action === 'backToMenu') {
+                loadActivity(0);
+            }
+        });
+
+        // ─── KEYBOARD SHORTCUT: ESC → back to menu ───
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && currentIndex !== 0) {
+                loadActivity(0);
+                e.preventDefault();
+            }
+        });
+
+        // ─── HANDLE IFRAME LOAD ERROR ───
+        frame.addEventListener('error', function() {
+            frame.style.display = 'none';
+            placeholder.style.display = 'flex';
+            placeholder.querySelector('.big-icon').textContent = '⚠️';
+            placeholder.querySelector('h2').textContent = 'Activity Not Found';
+            placeholder.querySelector('p').innerHTML =
+                'The activity file <strong>' + ACTIVITIES[currentIndex]?.file +
+                '</strong> could not be loaded. Please check that all HTML files are in the same folder.';
+        });
+
+        // ─── START WITH MAIN MENU ───
+        loadActivity(0);
+    </script>
+
+</body>
+</html>
